@@ -13,7 +13,7 @@ dashboard/   Admin dashboard views (no models) + analytics helpers
 guide/       Guide dashboard views (no models)
 chatbot/     Conversation, Message, knowledge builder, Groq/offline engine, JSON endpoints
 templates/   base.html (public), dash_base.html (shared dashboard shell), per-app folders, partials/
-static/      css/theme.css (tokens), site.css, dashboard.css, chatbot.css; js/*
+static/      css/theme.css (tokens), site.css, dashboard.css, chatbot.css; js/*; vendor/ (libraries)
 tests/       end-to-end test suite
 docs/        this documentation
 ```
@@ -30,7 +30,8 @@ docs/        this documentation
 - **Analytics** (`dashboard/analytics.py`) are pure queryset functions reused by both dashboards.
 - **Customization** is a cached singleton exposed to every template as `site` by
   `core.context_processors.site`.
-- **Front end**: Bootstrap 5 + a small token-based design layer; no build step.
+- **Front end**: Bootstrap 5 + a small token-based design layer; no build step. Third-party
+  libraries are vendored in `static/vendor/` (see its README for versions).
 
 ## Data model
 

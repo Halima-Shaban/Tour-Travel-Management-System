@@ -57,4 +57,5 @@ tests/       test suite
 docs/        documentation
 ```
 
-Tech: Django 5.1 · Bootstrap 5.3 · Chart.js 4 · FullCalendar 6 · Groq API. No front-end build step.
+Tech: Django 5.1 · Bootstrap 5.3 · Chart.js 4 · FullCalendar 6 · Groq API. No front-end build step;
+libraries are bundled in `static/vendor/`, so no CDN is needed.

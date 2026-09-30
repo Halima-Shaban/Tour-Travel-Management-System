@@ -1,7 +1,8 @@
 # Installation
 
 Requirements: **Python 3.10+** (tested on 3.11). No Node/npm build step - CSS/JS are plain files, and
-Bootstrap 5, Bootstrap Icons, Chart.js and FullCalendar load from the jsDelivr CDN.
+Bootstrap 5, Bootstrap Icons, Chart.js and FullCalendar are bundled in `static/vendor/`, so the
+site and dashboards work without a CDN.
 
 ```bash
 git clone <repo-url> && cd Tour-Travel-Management-System

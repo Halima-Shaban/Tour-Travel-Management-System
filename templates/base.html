@@ -14,7 +14,7 @@
   {% block footer %}{% include "partials/_footer.html" %}{% endblock %}
   <button class="btn btn-primary back-to-top" aria-label="Back to top"><i class="bi bi-arrow-up"></i></button>
   {% if site.chatbot_enabled %}{% include "partials/_chatbot.html" %}{% endif %}
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="{% static 'vendor/bootstrap/bootstrap.bundle.min.js' %}"></script>
   <script src="{% static 'js/site.js' %}"></script>
   {% block extra_js %}{% endblock %}
 </body>
