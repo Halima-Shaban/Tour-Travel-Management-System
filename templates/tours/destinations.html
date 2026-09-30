@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}Destinations{% endblock %}
+{% block content %}
+{% include "partials/_page_hero.html" with title="Destinations" subtitle="Explore the places our guides call home." %}
+<section class="section">
+  <div class="container">
+    <div class="row g-4">
+      {% for d in destinations %}
+      <div class="col-6 col-md-4 col-lg-3">
+        <a class="dest-card" href="{{ d.get_absolute_url }}"><img src="{{ d.cover }}" alt="{{ d.name }}" loading="lazy">
+          <div class="overlay"><small class="opacity-75"><i class="bi bi-geo-alt"></i> {{ d.country }}</small><h3>{{ d.name }}</h3><small>{{ d.tour_count }} tour{{ d.tour_count|pluralize }}</small></div></a>
+      </div>
+      {% empty %}<div class="empty-state"><i class="bi bi-globe"></i><p>No destinations yet.</p></div>{% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

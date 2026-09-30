@@ -1,0 +1,24 @@
+{% load ui %}
+<article class="tour-card">
+  <div class="media">
+    <img src="{{ tour.cover }}" alt="{{ tour.title }}" loading="lazy">
+    <span class="tag"><i class="bi bi-geo-alt-fill text-brand"></i> {{ tour.destination.name }}</span>
+    {% if tour.discount_percent %}<span class="discount">-{{ tour.discount_percent }}%</span>{% endif %}
+  </div>
+  <div class="body">
+    <div class="d-flex justify-content-between align-items-center">
+      <span class="small-caps text-brand">{{ tour.get_category_display }}</span>
+      {% if tour.rating %}<span class="rating"><i class="bi bi-star-fill"></i> <strong class="text-body">{{ tour.rating }}</strong></span>{% endif %}
+    </div>
+    <h3><a href="{{ tour.get_absolute_url }}">{{ tour.title }}</a></h3>
+    <div class="meta">
+      <span><i class="bi bi-clock"></i> {{ tour.duration_days }} day{{ tour.duration_days|pluralize }}</span>
+      <span><i class="bi bi-people"></i> Max {{ tour.max_group_size }}</span>
+      <span><i class="bi bi-bar-chart"></i> {{ tour.get_difficulty_display }}</span>
+    </div>
+    <div class="foot">
+      <div class="price">{% if tour.discount_percent %}<del>{{ tour.price|money:site.currency_symbol }}</del>{% endif %}{{ tour.current_price|money:site.currency_symbol }}<small class="text-muted-2 fw-normal fs-6"> /person</small></div>
+      <span class="btn btn-soft btn-sm rounded-circle"><i class="bi bi-arrow-right"></i></span>
+    </div>
+  </div>
+</article>

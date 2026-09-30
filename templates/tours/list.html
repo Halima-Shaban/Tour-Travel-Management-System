@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% block title %}Tours{% endblock %}
+{% block content %}
+{% include "partials/_page_hero.html" with title="Find your perfect tour" subtitle="Filter by destination, style, length and budget." %}
+<section class="section pt-0" style="margin-top:-2.5rem">
+  <div class="container">
+    <form class="filter-bar mb-4 position-relative" method="get">
+      <div class="row g-2">
+        <div class="col-lg-3">{{ form.q }}</div>
+        <div class="col-6 col-lg-2">{{ form.destination }}</div>
+        <div class="col-6 col-lg-2">{{ form.category }}</div>
+        <div class="col-6 col-lg-2">{{ form.duration }}</div>
+        <div class="col-6 col-lg-1">{{ form.max_price }}</div>
+        <div class="col-lg-2 d-grid"><button class="btn btn-primary"><i class="bi bi-funnel me-1"></i> Filter</button></div>
+      </div>
+    </form>
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+      <p class="mb-0 text-muted-2"><strong class="text-body">{{ total }}</strong> tour{{ total|pluralize }} found{% if request.GET.q %} for “{{ request.GET.q }}”{% endif %}</p>
+      <form method="get" class="d-flex align-items-center gap-2">
+        {% for key, value in request.GET.items %}{% if key != 'sort' and key != 'page' %}<input type="hidden" name="{{ key }}" value="{{ value }}">{% endif %}{% endfor %}
+        <label class="small text-muted-2 text-nowrap" for="id_sort">Sort by</label>
+        <select name="sort" id="id_sort" class="form-select form-select-sm" onchange="this.form.submit()">
+          {% for value, label in form.fields.sort.choices %}<option value="{{ value }}" {% if request.GET.sort == value %}selected{% endif %}>{{ label }}</option>{% endfor %}
+        </select>
+      </form>
+    </div>
+    <div class="row g-4">
+      {% for tour in page %}<div class="col-md-6 col-lg-4">{% include "partials/_tour_card.html" %}</div>
+      {% empty %}<div class="col-12 empty-state"><i class="bi bi-search"></i><h4 class="text-body mt-3">No tours match your filters</h4><p>Try widening your search - or <a href="#" data-open-chat>ask our assistant</a>.</p><a class="btn btn-outline-primary" href="{% url 'tours:list' %}">Clear filters</a></div>{% endfor %}
+    </div>
+    {% include "partials/_pagination.html" %}
+  </div>
+</section>
+{% endblock %}

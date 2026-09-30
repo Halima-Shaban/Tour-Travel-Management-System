@@ -1,0 +1,8 @@
+<aside class="d-flex flex-column gap-4">
+  <form class="card p-3" action="{% url 'blog:list' %}"><div class="input-group"><input class="form-control" name="q" value="{{ request.GET.q }}" placeholder="Search articles"><button class="btn btn-primary"><i class="bi bi-search"></i></button></div></form>
+  {% if categories %}<div class="card p-4"><h6 class="mb-3">Categories</h6>
+    {% for c in categories %}<a class="d-flex justify-content-between py-1 text-body" href="{% url 'blog:list' %}?category={{ c.slug }}">{{ c.name }}<span class="badge badge-soft-primary">{{ c.n }}</span></a>{% endfor %}</div>{% endif %}
+  {% if recent_posts %}<div class="card p-4"><h6 class="mb-3">Recent posts</h6>
+    {% for p in recent_posts %}<a class="d-flex gap-3 mb-3 text-body" href="{{ p.get_absolute_url }}"><img src="{{ p.cover }}" alt="" width="64" height="52" class="rounded object-fit-cover"><span><span class="d-block fw-600 small">{{ p.title }}</span><small class="text-muted-2">{{ p.created_at|date:"M d, Y" }}</small></span></a>{% endfor %}</div>{% endif %}
+  <div class="card p-4 bg-brand border-0"><h6 class="text-white">Planning a trip?</h6><p class="small opacity-75 mb-3">Our assistant can suggest tours in seconds.</p><a href="#" data-open-chat class="btn btn-light btn-sm">Ask now</a></div>
+</aside>

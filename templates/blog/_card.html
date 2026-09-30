@@ -1,0 +1,8 @@
+<article class="post-card position-relative">
+  <img src="{{ post.cover }}" alt="{{ post.title }}" loading="lazy">
+  <div class="body">
+    <div class="d-flex gap-3 small text-muted-2 mb-2">{% if post.category %}<span class="text-brand fw-600">{{ post.category }}</span>{% endif %}<span><i class="bi bi-calendar3"></i> {{ post.created_at|date:"M d, Y" }}</span></div>
+    <h3><a class="stretched-link" href="{{ post.get_absolute_url }}">{{ post.title }}</a></h3>
+    <p class="text-muted-2 mb-0 small">{{ post.excerpt|truncatechars:120 }}</p>
+  </div>
+</article>

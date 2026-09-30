@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}Profile{% endblock %}
+{% block content %}
+{% include "partials/_page_hero.html" with title="My profile" %}
+<section class="section">
+  <div class="container" style="max-width:760px">
+    <form class="card p-4 p-md-5" method="post" enctype="multipart/form-data" novalidate>{% csrf_token %}
+      <div class="row">{% for field in user_form %}<div class="col-md-{% if forloop.last %}12{% else %}6{% endif %}">{% include "partials/_field.html" %}</div>{% endfor %}</div>
+      {% for field in profile_form %}{% include "partials/_field.html" %}{% endfor %}
+      <button class="btn btn-primary">Save changes</button>
+    </form>
+  </div>
+</section>
+{% endblock %}

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Travel journal{% endblock %}
+{% block content %}
+{% include "partials/_page_hero.html" with title="Travel journal" subtitle="Tips, itineraries and stories from our guides." %}
+<section class="section">
+  <div class="container">
+    <div class="row g-5">
+      <div class="col-lg-8">
+        {% if category %}<p class="mb-4">Showing posts in <span class="badge badge-soft-primary">{{ category }}</span> <a class="small ms-2" href="{% url 'blog:list' %}">Clear</a></p>{% endif %}
+        <div class="row g-4">
+          {% for post in page %}<div class="col-md-6">{% include "blog/_card.html" %}</div>
+          {% empty %}<div class="empty-state"><i class="bi bi-journal-text"></i><p>No posts found.</p></div>{% endfor %}
+        </div>
+        {% include "partials/_pagination.html" %}
+      </div>
+      <div class="col-lg-4">{% include "blog/_sidebar.html" %}</div>
+    </div>
+  </div>
+</section>
+{% endblock %}

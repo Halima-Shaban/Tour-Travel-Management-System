@@ -1,0 +1,17 @@
+{% extends "dashboard/_base.html" %}
+{% block title %}Chatbot logs{% endblock %}
+{% block page_title %}Chatbot conversations{% endblock %}
+{% block topbar_actions %}<a class="btn btn-soft btn-sm" href="{% url 'dashboard:settings' %}#chatbot"><i class="bi bi-gear"></i> Chatbot settings</a>{% endblock %}
+{% block content %}
+<div class="alert alert-light border d-flex gap-2 align-items-center"><i class="bi bi-lightbulb text-brand"></i><span class="small">Read what visitors ask to discover missing tours, unclear policies and FAQ ideas. Engine: <strong>{% if groq_enabled %}Groq LLM{% else %}offline assistant{% endif %}</strong>.</span></div>
+<div class="panel">
+  {% for c in page %}
+  <a class="list-row text-body" href="{% url 'dashboard:chat_detail' c.pk %}">
+    <span class="icon-circle tone-violet" style="width:38px;height:38px"><i class="bi bi-chat-dots"></i></span>
+    <div class="grow"><div class="title">{% if c.user %}{{ c.user.get_full_name|default:c.user.username }}{% else %}Visitor #{{ c.pk }}{% endif %}</div><div class="sub">{{ c.messages.first.content|truncatechars:90 }}</div></div>
+    <span class="badge badge-soft-primary">{{ c.n }} msgs</span><span class="sub text-nowrap">{{ c.updated_at|timesince }} ago</span>
+  </a>
+  {% empty %}<div class="panel-body text-center text-muted-2 py-5">No conversations yet.</div>{% endfor %}
+  {% include "partials/_pagination.html" with pagination_class="py-3" %}
+</div>
+{% endblock %}

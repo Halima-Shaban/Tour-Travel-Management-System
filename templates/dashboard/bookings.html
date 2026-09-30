@@ -1,0 +1,51 @@
+{% extends "dashboard/_base.html" %}
+{% load ui %}
+{% block title %}Bookings{% endblock %}
+{% block page_title %}Bookings{% endblock %}
+{% block topbar_actions %}<a class="btn btn-soft btn-sm" href="{% url 'dashboard:booking_export' %}{% query page=None %}"><i class="bi bi-download"></i> Export CSV</a>{% endblock %}
+{% block content %}
+<div class="chip-tabs mb-3">
+  <a class="{% if not request.GET.status %}active{% endif %}" href="{% query status=None page=None %}">All<span class="n">{{ total }}</span></a>
+  {% for v, l in statuses %}<a class="{% if request.GET.status == v %}active{% endif %}" href="{% query status=v page=None %}">{{ l }}<span class="n">{% for k, n in counts.items %}{% if k == v %}{{ n }}{% endif %}{% endfor %}</span></a>{% endfor %}
+</div>
+<div class="panel">
+  <div class="panel-head">
+    <form class="filters" data-autosubmit>
+      {% if request.GET.status %}<input type="hidden" name="status" value="{{ request.GET.status }}">{% endif %}
+      <input class="form-control" name="q" value="{{ request.GET.q }}" placeholder="Reference, name, email, tour...">
+      <select class="form-select" name="payment"><option value="">Any payment</option>{% for v, l in payments %}<option value="{{ v }}" {% if request.GET.payment == v %}selected{% endif %}>{{ l }}</option>{% endfor %}</select>
+      <select class="form-select" name="when"><option value="">Any date</option><option value="upcoming" {% if request.GET.when == 'upcoming' %}selected{% endif %}>Upcoming</option><option value="past" {% if request.GET.when == 'past' %}selected{% endif %}>Past</option></select>
+    </form>
+    <span class="sub">{{ page.paginator.count }} results</span>
+  </div>
+  <div class="table-responsive"><table class="table table-dash">
+    <thead><tr><th>Reference</th><th>Customer</th><th>Tour / guide</th><th>Travel date</th><th>Pax</th><th>Total</th><th>Status</th><th>Payment</th><th></th></tr></thead>
+    <tbody>{% for b in page %}
+      <tr>
+        <td><a class="font-monospace fw-600" href="{% url 'dashboard:booking_edit' b.pk %}">{{ b.reference }}</a><div class="sub">{{ b.created_at|date:"M d" }}</div></td>
+        <td><div class="title">{{ b.full_name }}</div><div class="sub">{{ b.email }}</div></td>
+        <td><div>{{ b.tour.title|truncatechars:30 }}</div><div class="sub">{{ b.tour.guide.get_full_name|default:"No guide" }}</div></td>
+        <td class="text-nowrap">{{ b.travel_date|date:"M d, Y" }}</td>
+        <td>{{ b.travelers }}</td>
+        <td class="fw-600">{{ b.total_price|money:site.currency_symbol }}</td>
+        <td><span class="badge badge-soft-{{ b.status|status_color }}">{{ b.get_status_display }}</span></td>
+        <td><span class="badge badge-soft-{{ b.payment_status|status_color }}">{{ b.get_payment_status_display }}</span></td>
+        <td class="text-end">
+          <div class="dropdown"><button class="btn btn-sm btn-light" data-bs-toggle="dropdown"><i class="bi bi-three-dots"></i></button>
+            <div class="dropdown-menu dropdown-menu-end shadow border-0">
+              <a class="dropdown-item" href="{% url 'dashboard:booking_edit' b.pk %}"><i class="bi bi-pencil me-2"></i>Open</a>
+              <form method="post" action="{% url 'dashboard:booking_status' b.pk %}">{% csrf_token %}
+                {% if b.status == 'pending' %}<button class="dropdown-item" name="status" value="confirmed"><i class="bi bi-check2-circle me-2 text-primary"></i>Confirm</button>{% endif %}
+                {% if b.status == 'confirmed' %}<button class="dropdown-item" name="status" value="completed"><i class="bi bi-flag me-2 text-success"></i>Mark completed</button>{% endif %}
+                {% if b.payment_status == 'unpaid' %}<button class="dropdown-item" name="payment_status" value="paid"><i class="bi bi-credit-card me-2 text-success"></i>Mark paid</button>{% endif %}
+                {% if b.status != 'cancelled' %}<button class="dropdown-item text-danger" name="status" value="cancelled"><i class="bi bi-x-circle me-2"></i>Cancel</button>{% endif %}
+              </form>
+            </div>
+          </div>
+        </td>
+      </tr>
+    {% empty %}<tr><td colspan="9" class="text-center text-muted-2 py-5">No bookings match these filters.</td></tr>{% endfor %}</tbody>
+  </table></div>
+  {% include "partials/_pagination.html" with pagination_class="py-3" %}
+</div>
+{% endblock %}

@@ -1,0 +1,48 @@
+{% now "Y" as year %}
+<footer class="site-footer">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-lg-4">
+        <a class="d-flex align-items-center gap-2 text-white fw-bold fs-4 mb-3" href="{% url 'core:home' %}"><span class="brand-mark d-inline-grid rounded-3 bg-brand" style="width:36px;height:36px;place-items:center"><i class="bi bi-airplane-fill"></i></span>{{ site.site_name }}</a>
+        <p>{{ site.tagline }}.</p>
+        <div class="social mt-3">
+          {% if site.facebook_url %}<a href="{{ site.facebook_url }}" target="_blank" rel="noopener" aria-label="Facebook"><i class="bi bi-facebook"></i></a>{% endif %}
+          {% if site.instagram_url %}<a href="{{ site.instagram_url }}" target="_blank" rel="noopener" aria-label="Instagram"><i class="bi bi-instagram"></i></a>{% endif %}
+          {% if site.twitter_url %}<a href="{{ site.twitter_url }}" target="_blank" rel="noopener" aria-label="X"><i class="bi bi-twitter-x"></i></a>{% endif %}
+          {% if site.youtube_url %}<a href="{{ site.youtube_url }}" target="_blank" rel="noopener" aria-label="YouTube"><i class="bi bi-youtube"></i></a>{% endif %}
+          {% if site.whatsapp %}<a href="https://wa.me/{{ site.whatsapp|cut:'+'|cut:' ' }}" target="_blank" rel="noopener" aria-label="WhatsApp"><i class="bi bi-whatsapp"></i></a>{% endif %}
+        </div>
+      </div>
+      <div class="col-6 col-lg-2">
+        <h5>Explore</h5>
+        <ul class="list-unstyled links">
+          <li><a href="{% url 'tours:list' %}">All tours</a></li>
+          <li><a href="{% url 'tours:destinations' %}">Destinations</a></li>
+          <li><a href="{% url 'blog:list' %}">Travel journal</a></li>
+          <li><a href="{% url 'core:about' %}">About us</a></li>
+        </ul>
+      </div>
+      <div class="col-6 col-lg-2">
+        <h5>Support</h5>
+        <ul class="list-unstyled links">
+          <li><a href="{% url 'core:contact' %}">Contact</a></li>
+          <li><a href="{% url 'accounts:bookings' %}">My bookings</a></li>
+          <li><a href="#" data-open-chat>Chat with us</a></li>
+          <li><a href="{% url 'accounts:login' %}">Guide login</a></li>
+        </ul>
+      </div>
+      <div class="col-lg-4">
+        <h5>Get in touch</h5>
+        <ul class="list-unstyled links">
+          <li><i class="bi bi-geo-alt me-2"></i>{{ site.address }}</li>
+          <li><i class="bi bi-telephone me-2"></i><a href="tel:{{ site.phone|cut:' ' }}">{{ site.phone }}</a></li>
+          <li><i class="bi bi-envelope me-2"></i><a href="mailto:{{ site.email }}">{{ site.email }}</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="bottom d-flex flex-wrap justify-content-between gap-2">
+      <span>&copy; {{ year }} {{ site.site_name }}. All rights reserved.</span>
+      <span>{{ site.footer_text }}</span>
+    </div>
+  </div>
+</footer>

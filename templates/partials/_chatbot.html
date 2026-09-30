@@ -1,0 +1,25 @@
+{% load static %}
+<div id="chatbot" data-message-url="{% url 'chatbot:message' %}" data-history-url="{% url 'chatbot:history' %}" data-reset-url="{% url 'chatbot:reset' %}" data-welcome="{{ site.chatbot_welcome }}" data-csrf="{{ csrf_token }}">
+  <div class="chat-panel" role="dialog" aria-label="{{ site.chatbot_name }}">
+    <div class="chat-head">
+      <div class="bot-avatar"><i class="bi bi-robot"></i></div>
+      <div class="flex-grow-1"><div class="fw-600">{{ site.chatbot_name }}</div><div class="status">Online · replies instantly</div></div>
+      <button type="button" data-reset title="New conversation"><i class="bi bi-arrow-counterclockwise"></i></button>
+      <button type="button" data-close title="Close"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div class="chat-body" aria-live="polite"></div>
+    <div class="chat-suggestions">
+      <button type="button">Show me tours in Egypt</button>
+      <button type="button">Cheapest tours?</button>
+      <button type="button">How do I book?</button>
+      <button type="button">عايز رحلة 3 أيام</button>
+    </div>
+    <div class="chat-foot">
+      <textarea rows="1" placeholder="Ask about tours, prices, bookings..." aria-label="Message" maxlength="1000"></textarea>
+      <button type="button" data-send aria-label="Send"><i class="bi bi-send-fill"></i></button>
+    </div>
+    <div class="chat-note">AI assistant · answers may need confirmation</div>
+  </div>
+  <button type="button" class="chat-launcher" aria-label="Open chat"><span class="pulse"></span><i class="bi bi-chat-dots-fill"></i></button>
+</div>
+<script src="{% static 'js/chatbot.js' %}" defer></script>

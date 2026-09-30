@@ -1,0 +1,107 @@
+/* ==========================================================================
+   Shared design tokens. --brand / --accent / --ink / --radius / --font are
+   injected at runtime from Site settings (templates/partials/_theme.html).
+   ========================================================================== */
+:root {
+  --brand: #0f766e;
+  --accent: #f59e0b;
+  --ink: #0f172a;
+  --radius: 14px;
+  --font: "Poppins";
+  --brand-soft: color-mix(in srgb, var(--brand) 12%, transparent);
+  --brand-dark: color-mix(in srgb, var(--brand) 80%, #000);
+  --accent-soft: color-mix(in srgb, var(--accent) 16%, transparent);
+  --surface: #ffffff;
+  --surface-2: #f6f8fb;
+  --line: #e5e9f0;
+  --muted: #64748b;
+  --shadow-sm: 0 1px 2px rgba(15, 23, 42, .06), 0 1px 3px rgba(15, 23, 42, .08);
+  --shadow: 0 10px 30px -12px rgba(15, 23, 42, .18);
+  --shadow-lg: 0 24px 60px -20px rgba(15, 23, 42, .35);
+  --bs-primary: var(--brand);
+  --bs-link-color: var(--brand);
+  --bs-link-hover-color: var(--brand-dark);
+  --bs-border-radius: var(--radius);
+  --bs-body-font-family: var(--font), system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+[data-bs-theme="dark"] {
+  --surface: #111827;
+  --surface-2: #0b1120;
+  --line: #1f2a3c;
+  --muted: #94a3b8;
+  --bs-body-bg: #0b1120;
+  --bs-body-color: #e2e8f0;
+  --shadow: 0 10px 30px -12px rgba(0, 0, 0, .6);
+}
+
+body { font-family: var(--bs-body-font-family); -webkit-font-smoothing: antialiased; }
+a { text-decoration: none; color: var(--brand); }
+a:hover { color: var(--brand-dark); }
+.rating { color: #f59e0b; font-size: .85rem; }
+::selection { background: var(--brand); color: #fff; }
+
+/* Buttons ---------------------------------------------------------------- */
+.btn { border-radius: calc(var(--radius) * .7); font-weight: 500; padding: .55rem 1.15rem; transition: all .2s ease; }
+.btn-sm { padding: .3rem .7rem; }
+.btn-lg { padding: .8rem 1.6rem; }
+.btn-primary, .btn-brand {
+  --bs-btn-bg: var(--brand); --bs-btn-border-color: var(--brand);
+  --bs-btn-hover-bg: var(--brand-dark); --bs-btn-hover-border-color: var(--brand-dark);
+  --bs-btn-active-bg: var(--brand-dark); --bs-btn-active-border-color: var(--brand-dark);
+  --bs-btn-disabled-bg: var(--brand); --bs-btn-disabled-border-color: var(--brand);
+  --bs-btn-color: #fff; --bs-btn-hover-color: #fff; --bs-btn-active-color: #fff;
+}
+.btn-primary:hover, .btn-brand:hover { transform: translateY(-1px); box-shadow: 0 8px 20px -8px var(--brand); }
+.btn-accent {
+  --bs-btn-bg: var(--accent); --bs-btn-border-color: var(--accent); --bs-btn-color: #1f1300;
+  --bs-btn-hover-bg: color-mix(in srgb, var(--accent) 85%, #000); --bs-btn-hover-border-color: transparent; --bs-btn-hover-color: #1f1300;
+}
+.btn-outline-primary {
+  --bs-btn-color: var(--brand); --bs-btn-border-color: var(--brand);
+  --bs-btn-hover-bg: var(--brand); --bs-btn-hover-border-color: var(--brand); --bs-btn-hover-color: #fff;
+  --bs-btn-active-bg: var(--brand); --bs-btn-active-border-color: var(--brand);
+}
+.btn-soft { background: var(--brand-soft); color: var(--brand); border: 0; }
+.btn-soft:hover { background: var(--brand); color: #fff; }
+
+/* Utilities --------------------------------------------------------------- */
+.text-brand { color: var(--brand) !important; }
+.text-accent { color: var(--accent) !important; }
+.bg-brand { background: var(--brand) !important; color: #fff; }
+.bg-brand-soft { background: var(--brand-soft) !important; }
+.bg-surface-2 { background: var(--surface-2) !important; }
+.text-muted-2 { color: var(--muted) !important; }
+.rounded-brand { border-radius: var(--radius) !important; }
+.fw-600 { font-weight: 600; }
+.small-caps { text-transform: uppercase; letter-spacing: .08em; font-size: .75rem; font-weight: 600; }
+.icon-circle { width: 44px; height: 44px; border-radius: 50%; display: inline-grid; place-items: center; flex-shrink: 0; }
+.avatar { width: 40px; height: 40px; border-radius: 50%; display: inline-grid; place-items: center; background: var(--brand-soft); color: var(--brand); font-weight: 600; font-size: .85rem; overflow: hidden; flex-shrink: 0; }
+.avatar img { width: 100%; height: 100%; object-fit: cover; }
+.avatar-lg { width: 72px; height: 72px; font-size: 1.3rem; }
+
+/* Forms ------------------------------------------------------------------- */
+.form-control, .form-select { border-radius: calc(var(--radius) * .6); padding: .6rem .9rem; border-color: var(--line); }
+.form-control:focus, .form-select:focus, .form-check-input:focus { border-color: var(--brand); box-shadow: 0 0 0 .2rem var(--brand-soft); }
+.form-check-input:checked { background-color: var(--brand); border-color: var(--brand); }
+.form-label { font-weight: 500; font-size: .9rem; margin-bottom: .35rem; }
+.form-control-color { width: 4rem; height: 2.6rem; padding: .25rem; }
+.errorlist { list-style: none; padding: 0; margin: .25rem 0 0; color: var(--bs-danger); font-size: .85rem; }
+
+/* Badges ------------------------------------------------------------------ */
+.badge { font-weight: 500; padding: .4em .7em; border-radius: 999px; }
+.badge-soft-primary { background: var(--brand-soft); color: var(--brand); }
+.badge-soft-success { background: rgba(22, 163, 74, .12); color: #15803d; }
+.badge-soft-warning { background: rgba(245, 158, 11, .15); color: #b45309; }
+.badge-soft-danger { background: rgba(220, 38, 38, .12); color: #b91c1c; }
+.badge-soft-info { background: rgba(14, 165, 233, .12); color: #0369a1; }
+.badge-soft-secondary { background: rgba(100, 116, 139, .14); color: #475569; }
+[data-bs-theme="dark"] .badge-soft-secondary { color: #cbd5e1; }
+
+.card { border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+.alert { border-radius: var(--radius); border: 0; }
+.pagination .page-link { border: 0; margin: 0 .15rem; border-radius: 10px !important; color: var(--ink); }
+[data-bs-theme="dark"] .pagination .page-link { color: #e2e8f0; background: transparent; }
+.pagination .active .page-link { background: var(--brand); color: #fff; }
+.nav-pills .nav-link { color: var(--muted); border-radius: 999px; font-weight: 500; }
+.nav-pills .nav-link.active { background: var(--brand); color: #fff; }

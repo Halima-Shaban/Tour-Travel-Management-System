@@ -1,0 +1,20 @@
+{% extends "dashboard/_base.html" %}
+{% block title %}{{ msg.subject }}{% endblock %}
+{% block crumbs %}Admin / <a href="{% url 'dashboard:messages' %}">Inbox</a>{% endblock %}
+{% block page_title %}{{ msg.subject }}{% endblock %}
+{% block content %}
+<div class="panel" style="max-width:860px">
+  <div class="panel-head">
+    <div class="d-flex gap-3 align-items-center"><span class="avatar">{{ msg.name|first|upper }}</span><div><div class="fw-600">{{ msg.name }}</div><div class="sub">{{ msg.email }}{% if msg.phone %} · {{ msg.phone }}{% endif %}</div></div></div>
+    <span class="sub">{{ msg.created_at|date:"M d, Y H:i" }}</span>
+  </div>
+  <div class="panel-body"><p class="mb-0" style="white-space:pre-wrap">{{ msg.message }}</p></div>
+  <div class="panel-head border-top border-bottom-0">
+    <a class="btn btn-primary" href="mailto:{{ msg.email }}?subject=Re: {{ msg.subject|urlencode }}"><i class="bi bi-reply"></i> Reply by email</a>
+    <form method="post" class="d-flex gap-2">{% csrf_token %}
+      <button class="btn btn-light" name="action" value="toggle">Mark as unread</button>
+      <button class="btn btn-light text-danger" name="action" value="delete" onclick="return confirm('Delete this message?')"><i class="bi bi-trash"></i></button>
+    </form>
+  </div>
+</div>
+{% endblock %}

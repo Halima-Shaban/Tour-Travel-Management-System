@@ -1,0 +1,21 @@
+{% extends "dashboard/_base.html" %}
+{% block title %}{{ title }}{% endblock %}
+{% block crumbs %}Admin / <a href="{{ back_url }}">Back</a>{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+{% block content %}
+<form method="post" enctype="multipart/form-data" novalidate class="panel" style="max-width:980px">{% csrf_token %}
+  {% if subtitle %}<div class="panel-head"><span class="sub">{{ subtitle }}</span></div>{% endif %}
+  <div class="panel-body">
+    {% include "partials/_form_errors.html" %}
+    <div class="row">
+      {% for field in form %}
+      <div class="{% if field.field.widget.input_type == 'checkbox' or field.field.widget.attrs.rows %}col-12{% else %}col-md-6{% endif %}">{% include "partials/_field.html" %}</div>
+      {% endfor %}
+    </div>
+  </div>
+  <div class="panel-head border-top border-bottom-0 justify-content-end">
+    <a class="btn btn-light" href="{{ back_url }}">Cancel</a>
+    <button class="btn btn-primary"><i class="bi bi-check2 me-1"></i> Save</button>
+  </div>
+</form>
+{% endblock %}

@@ -1,0 +1,13 @@
+{% load ui %}
+{% if page.has_other_pages %}
+<nav aria-label="Pagination" class="{{ pagination_class|default:'mt-5' }}">
+  <ul class="pagination justify-content-center mb-0">
+    {% if page.has_previous %}<li class="page-item"><a class="page-link" href="{% query page=page.previous_page_number %}"><i class="bi bi-chevron-left"></i></a></li>{% endif %}
+    {% for n in page.paginator.page_range %}
+      {% if n == page.number %}<li class="page-item active"><span class="page-link">{{ n }}</span></li>
+      {% elif n > page.number|add:'-3' and n < page.number|add:'3' %}<li class="page-item"><a class="page-link" href="{% query page=n %}">{{ n }}</a></li>{% endif %}
+    {% endfor %}
+    {% if page.has_next %}<li class="page-item"><a class="page-link" href="{% query page=page.next_page_number %}"><i class="bi bi-chevron-right"></i></a></li>{% endif %}
+  </ul>
+</nav>
+{% endif %}

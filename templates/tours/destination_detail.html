@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}{{ destination.name }}{% endblock %}
+{% block content %}
+{% url 'tours:destinations' as dest_url %}
+{% include "partials/_page_hero.html" with title=destination.name subtitle=destination.description hero_image=destination.cover crumb_url=dest_url crumb_label="Destinations" %}
+<section class="section">
+  <div class="container">
+    <h2 class="h4 mb-4">{{ tours|length }} tour{{ tours|length|pluralize }} in {{ destination.name }}, {{ destination.country }}</h2>
+    <div class="row g-4">
+      {% for tour in tours %}<div class="col-md-6 col-lg-4">{% include "partials/_tour_card.html" %}</div>
+      {% empty %}<div class="empty-state"><i class="bi bi-map"></i><p>New tours are coming soon. <a href="{% url 'core:contact' %}">Ask us</a> for a custom trip.</p></div>{% endfor %}
+    </div>
+  </div>
+</section>
+{% endblock %}

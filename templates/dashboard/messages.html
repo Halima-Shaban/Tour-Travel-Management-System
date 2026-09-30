@@ -1,0 +1,16 @@
+{% extends "dashboard/_base.html" %}
+{% block title %}Inbox{% endblock %}
+{% block page_title %}Inbox{% endblock %}
+{% block content %}
+<div class="chip-tabs mb-3"><a class="{% if not request.GET.unread %}active{% endif %}" href="?">All</a><a class="{% if request.GET.unread %}active{% endif %}" href="?unread=1">Unread</a></div>
+<div class="panel">
+  {% for m in page %}
+  <a class="list-row text-body" href="{% url 'dashboard:message_detail' m.pk %}">
+    <span class="avatar">{{ m.name|first|upper }}</span>
+    <div class="grow"><div class="title {% if not m.is_read %}text-brand{% endif %}">{% if not m.is_read %}<i class="bi bi-circle-fill me-1" style="font-size:.5rem"></i>{% endif %}{{ m.subject }}</div><div class="sub text-truncate">{{ m.name }} · {{ m.message|truncatechars:90 }}</div></div>
+    <span class="sub text-nowrap">{{ m.created_at|timesince }} ago</span>
+  </a>
+  {% empty %}<div class="panel-body text-center text-muted-2 py-5"><i class="bi bi-inbox fs-1 d-block mb-2"></i>Inbox zero 🎉</div>{% endfor %}
+  {% include "partials/_pagination.html" with pagination_class="py-3" %}
+</div>
+{% endblock %}

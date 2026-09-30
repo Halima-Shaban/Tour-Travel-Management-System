@@ -1,0 +1,20 @@
+{% extends "guide/_base.html" %}
+{% load ui %}
+{% block title %}Reviews{% endblock %}
+{% block page_title %}My reviews{% endblock %}
+{% block content %}
+<div class="row g-3">
+  <div class="col-lg-4"><div class="panel panel-body text-center">
+    <div class="display-4 fw-bold">{{ summary.avg|floatformat:1|default:"-" }}</div>
+    <div class="rating fs-5 mb-1">{% for s in summary.avg|stars %}<i class="bi {{ s }}"></i>{% endfor %}</div>
+    <div class="text-muted-2 small mb-4">{{ summary.n }} review{{ summary.n|pluralize }}</div>
+    {% for stars_n, count in distribution.items %}
+    <div class="d-flex align-items-center gap-2 small mb-2"><span style="width:28px">{{ stars_n }}<i class="bi bi-star-fill text-warning"></i></span><div class="progress progress-thin flex-grow-1"><div class="progress-bar" style="width:{% if summary.n %}{% widthratio count summary.n 100 %}{% else %}0{% endif %}%"></div></div><span class="text-muted-2" style="width:24px">{{ count }}</span></div>
+    {% endfor %}
+  </div></div>
+  <div class="col-lg-8"><div class="panel">
+    {% for r in reviews %}<div class="list-row align-items-start"><span class="avatar">{{ r.user|initials }}</span><div class="grow"><div class="d-flex justify-content-between flex-wrap"><strong class="small">{{ r.user.get_full_name|default:r.user.username }}</strong><span class="rating">{% for s in r.rating|stars %}<i class="bi {{ s }}"></i>{% endfor %}</span></div><div class="sub">{{ r.tour.title }} · {{ r.created_at|date:"M d, Y" }}</div><p class="small mb-0 mt-1">{{ r.comment }}</p></div></div>
+    {% empty %}<div class="panel-body text-center text-muted-2 py-5">No reviews yet.</div>{% endfor %}
+  </div></div>
+</div>
+{% endblock %}

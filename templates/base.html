@@ -1,0 +1,21 @@
+{% load static %}<!doctype html>
+<html lang="en">
+<head>
+  {% include "partials/_head.html" %}
+  <link href="{% static 'css/site.css' %}" rel="stylesheet">
+  {% if site.chatbot_enabled %}<link href="{% static 'css/chatbot.css' %}" rel="stylesheet">{% endif %}
+  <title>{% block title %}{{ site.site_name }}{% endblock %} · {{ site.site_name }}</title>
+  {% block extra_head %}{% endblock %}
+</head>
+<body class="site">
+  {% block navbar %}{% include "partials/_navbar.html" %}{% endblock %}
+  {% include "partials/_messages.html" %}
+  <main>{% block content %}{% endblock %}</main>
+  {% block footer %}{% include "partials/_footer.html" %}{% endblock %}
+  <button class="btn btn-primary back-to-top" aria-label="Back to top"><i class="bi bi-arrow-up"></i></button>
+  {% if site.chatbot_enabled %}{% include "partials/_chatbot.html" %}{% endif %}
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="{% static 'js/site.js' %}"></script>
+  {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,40 @@
+{% extends "dashboard/_base.html" %}
+{% load ui %}
+{% block title %}Tours{% endblock %}
+{% block page_title %}Tours{% endblock %}
+{% block topbar_actions %}<a class="btn btn-primary btn-sm" href="{% url 'dashboard:tour_create' %}"><i class="bi bi-plus-lg"></i> New tour</a>{% endblock %}
+{% block content %}
+<div class="panel">
+  <div class="panel-head">
+    <form class="filters" data-autosubmit>
+      <input class="form-control" name="q" value="{{ request.GET.q }}" placeholder="Search tours...">
+      <select class="form-select" name="category"><option value="">All categories</option>{% for v, l in categories %}<option value="{{ v }}" {% if request.GET.category == v %}selected{% endif %}>{{ l }}</option>{% endfor %}</select>
+      <select class="form-select" name="status"><option value="">Any status</option><option value="active" {% if request.GET.status == 'active' %}selected{% endif %}>Active</option><option value="inactive" {% if request.GET.status == 'inactive' %}selected{% endif %}>Inactive</option></select>
+    </form>
+    <span class="sub">{{ page.paginator.count }} tours</span>
+  </div>
+  <div class="table-responsive"><table class="table table-dash">
+    <thead><tr><th>Tour</th><th>Guide</th><th>Price</th><th>Days</th><th>Rating</th><th>Bookings</th><th>Status</th><th class="text-end">Actions</th></tr></thead>
+    <tbody>{% for t in page %}
+      <tr>
+        <td><div class="d-flex align-items-center gap-3"><img class="thumb" src="{{ t.cover }}" alt=""><div><div class="title">{{ t.title|truncatechars:40 }}</div><div class="sub">{{ t.destination.name }} · {{ t.get_category_display }}</div></div></div></td>
+        <td>{% if t.guide %}{{ t.guide.get_full_name }}{% else %}<span class="badge badge-soft-danger">Unassigned</span>{% endif %}</td>
+        <td class="fw-600">{{ t.current_price|money:site.currency_symbol }}{% if t.discount_percent %} <span class="badge badge-soft-warning">-{{ t.discount_percent }}%</span>{% endif %}</td>
+        <td>{{ t.duration_days }}</td>
+        <td>{% if t.avg_rating %}<i class="bi bi-star-fill text-warning"></i> {{ t.avg_rating|floatformat:1 }}{% else %}-{% endif %}</td>
+        <td>{{ t.n_bookings }}</td>
+        <td>
+          <form method="post" action="{% url 'dashboard:tour_toggle' t.pk %}" class="d-inline">{% csrf_token %}<input type="hidden" name="field" value="is_active"><button class="badge border-0 badge-soft-{% if t.is_active %}success{% else %}secondary{% endif %}" title="Toggle">{% if t.is_active %}Active{% else %}Hidden{% endif %}</button></form>
+          <form method="post" action="{% url 'dashboard:tour_toggle' t.pk %}" class="d-inline">{% csrf_token %}<input type="hidden" name="field" value="is_featured"><button class="btn btn-link p-0 {% if t.is_featured %}text-warning{% else %}text-muted-2{% endif %}" title="Toggle featured"><i class="bi bi-star{% if t.is_featured %}-fill{% endif %}"></i></button></form>
+        </td>
+        <td class="text-end text-nowrap">
+          <a class="btn btn-sm btn-light" href="{{ t.get_absolute_url }}" target="_blank" title="View"><i class="bi bi-eye"></i></a>
+          <a class="btn btn-sm btn-light" href="{% url 'dashboard:tour_edit' t.pk %}" title="Edit"><i class="bi bi-pencil"></i></a>
+          <a class="btn btn-sm btn-light text-danger" href="{% url 'dashboard:tour_delete' t.pk %}" title="Delete"><i class="bi bi-trash"></i></a>
+        </td>
+      </tr>
+    {% empty %}<tr><td colspan="8" class="text-center text-muted-2 py-5">No tours found.</td></tr>{% endfor %}</tbody>
+  </table></div>
+  {% include "partials/_pagination.html" with pagination_class="py-3" %}
+</div>
+{% endblock %}

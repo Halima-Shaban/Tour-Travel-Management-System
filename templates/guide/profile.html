@@ -1,0 +1,13 @@
+{% extends "guide/_base.html" %}
+{% block title %}My profile{% endblock %}
+{% block page_title %}My profile{% endblock %}
+{% block content %}
+<form method="post" enctype="multipart/form-data" novalidate class="panel" style="max-width:860px">{% csrf_token %}
+  <div class="panel-head"><div class="d-flex gap-3 align-items-center"><span class="avatar avatar-lg">{% if user.profile.avatar %}<img src="{{ user.profile.avatar.url }}" alt="">{% else %}{{ user.get_full_name|default:user.username|first|upper }}{% endif %}</span><div><div class="fw-600">{{ user.get_full_name }}</div><div class="sub">Shown to travelers on your tour pages</div></div></div></div>
+  <div class="panel-body">
+    <div class="row">{% for field in user_form %}<div class="col-md-4">{% include "partials/_field.html" %}</div>{% endfor %}</div>
+    <div class="row">{% for field in profile_form %}<div class="{% if field.field.widget.attrs.rows or field.field.widget.input_type == 'checkbox' %}col-12{% else %}col-md-6{% endif %}">{% include "partials/_field.html" %}</div>{% endfor %}</div>
+  </div>
+  <div class="panel-head border-top border-bottom-0 justify-content-end"><button class="btn btn-primary">Save profile</button></div>
+</form>
+{% endblock %}

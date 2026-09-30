@@ -1,0 +1,16 @@
+{% extends "dash_base.html" %}
+{% load ui %}
+{% block home_url %}{% url 'guide:home' %}{% endblock %}
+{% block role_label %}Guide{% endblock %}
+{% block crumbs %}Guide{% endblock %}
+{% block sidebar %}
+<div class="group">My work</div>
+<a class="{% active 'guide:home' exact=True %}" href="{% url 'guide:home' %}"><i class="bi bi-grid-1x2"></i> Overview</a>
+<a class="{% active 'guide:calendar' %}" href="{% url 'guide:calendar' %}"><i class="bi bi-calendar3"></i> Schedule</a>
+<a class="{% active 'guide:bookings' %}" href="{% url 'guide:bookings' %}"><i class="bi bi-people"></i> Travelers & bookings</a>
+<a class="{% active 'guide:tours' %}" href="{% url 'guide:tours' %}"><i class="bi bi-map"></i> My tours</a>
+<a class="{% active 'guide:reviews' %}" href="{% url 'guide:reviews' %}"><i class="bi bi-star"></i> Reviews</a>
+<div class="group">Account</div>
+<a class="{% active 'guide:profile' %}" href="{% url 'guide:profile' %}"><i class="bi bi-person-gear"></i> My profile</a>
+{% endblock %}
+{% block user_menu %}<li><a class="dropdown-item" href="{% url 'guide:profile' %}"><i class="bi bi-person-gear me-2"></i>My profile</a></li>{% endblock %}

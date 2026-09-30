@@ -1,0 +1,12 @@
+{% extends "dashboard/_base.html" %}
+{% block title %}Conversation #{{ conversation.pk }}{% endblock %}
+{% block crumbs %}Admin / <a href="{% url 'dashboard:chats' %}">Chatbot logs</a>{% endblock %}
+{% block page_title %}Conversation #{{ conversation.pk }}{% endblock %}
+{% block content %}
+<div class="panel" style="max-width:860px">
+  <div class="panel-head"><span class="sub">{% if conversation.user %}{{ conversation.user.email }}{% else %}Anonymous visitor{% endif %} · started {{ conversation.created_at|date:"M d, Y H:i" }}</span></div>
+  <div class="panel-body chat-log d-flex flex-column">
+    {% for m in messages_list %}<div class="bubble {{ m.role }}" {% if m.role == 'user' %}dir="auto"{% endif %}>{{ m.content }}{% if m.role == 'assistant' %}<div class="small text-muted-2 mt-1" style="font-size:.7rem">{{ m.get_source_display }} · {{ m.created_at|time:"H:i" }}</div>{% endif %}</div>{% endfor %}
+  </div>
+</div>
+{% endblock %}

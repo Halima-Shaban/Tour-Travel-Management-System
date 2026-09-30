@@ -1,0 +1,23 @@
+{% extends "guide/_base.html" %}
+{% block title %}Schedule{% endblock %}
+{% block page_title %}My schedule{% endblock %}
+{% block content %}
+<div class="panel"><div class="panel-body">
+  <div class="d-flex gap-3 flex-wrap small mb-3"><span><i class="bi bi-circle-fill" style="color:#f59e0b"></i> Pending</span><span><i class="bi bi-circle-fill" style="color:#0f766e"></i> Confirmed</span><span><i class="bi bi-circle-fill" style="color:#16a34a"></i> Completed</span></div>
+  <div id="calendar"></div>
+</div></div>
+{% endblock %}
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const cal = new FullCalendar.Calendar(document.getElementById("calendar"), {
+    initialView: window.innerWidth < 768 ? "listMonth" : "dayGridMonth",
+    headerToolbar: { left: "prev,next today", center: "title", right: "dayGridMonth,listMonth" },
+    events: "{% url 'guide:calendar_events' %}",
+    height: "auto", dayMaxEvents: 3,
+  });
+  cal.render();
+});
+</script>
+{% endblock %}

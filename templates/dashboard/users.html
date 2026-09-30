@@ -1,0 +1,30 @@
+{% extends "dashboard/_base.html" %}
+{% load ui %}
+{% block title %}Users{% endblock %}
+{% block page_title %}Users{% endblock %}
+{% block content %}
+<div class="panel">
+  <div class="panel-head">
+    <form class="filters" data-autosubmit>
+      <input class="form-control" name="q" value="{{ request.GET.q }}" placeholder="Search name, username, email...">
+      <select class="form-select" name="role"><option value="">All roles</option>{% for v, l in roles %}<option value="{{ v }}" {% if request.GET.role == v %}selected{% endif %}>{{ l }}</option>{% endfor %}</select>
+    </form>
+    <span class="sub">{{ page.paginator.count }} users</span>
+  </div>
+  <div class="table-responsive"><table class="table table-dash">
+    <thead><tr><th>User</th><th>Role</th><th>Bookings</th><th>Joined</th><th>Last login</th><th>Status</th><th></th></tr></thead>
+    <tbody>{% for u in page %}
+      <tr>
+        <td><div class="d-flex align-items-center gap-2"><span class="avatar">{{ u|initials }}</span><div><div class="title">{{ u.get_full_name|default:u.username }}</div><div class="sub">@{{ u.username }} · {{ u.email }}</div></div></div></td>
+        <td><span class="badge {% if u.profile.role == 'admin' %}badge-soft-danger{% elif u.profile.role == 'guide' %}badge-soft-primary{% else %}badge-soft-secondary{% endif %}">{{ u.profile.get_role_display }}</span></td>
+        <td>{{ u.n_bookings }}</td>
+        <td>{{ u.date_joined|date:"M d, Y" }}</td>
+        <td>{{ u.last_login|date:"M d, Y"|default:"Never" }}</td>
+        <td>{% if u.is_active %}<span class="badge badge-soft-success">Active</span>{% else %}<span class="badge badge-soft-secondary">Disabled</span>{% endif %}</td>
+        <td class="text-end"><a class="btn btn-sm btn-light" href="{% url 'dashboard:user_edit' u.pk %}"><i class="bi bi-pencil"></i></a></td>
+      </tr>
+    {% empty %}<tr><td colspan="7" class="text-center text-muted-2 py-5">No users found.</td></tr>{% endfor %}</tbody>
+  </table></div>
+  {% include "partials/_pagination.html" with pagination_class="py-3" %}
+</div>
+{% endblock %}

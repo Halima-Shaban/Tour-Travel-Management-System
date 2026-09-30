@@ -1,0 +1,24 @@
+{% extends "guide/_base.html" %}
+{% block title %}My tours{% endblock %}
+{% block page_title %}My tours{% endblock %}
+{% block content %}
+<div class="row g-3">
+  {% for t in tours %}
+  <div class="col-md-6 col-xl-4">
+    <div class="panel overflow-hidden h-100 d-flex flex-column">
+      <img src="{{ t.cover }}" class="w-100" style="aspect-ratio:16/9;object-fit:cover" alt="">
+      <div class="panel-body d-flex flex-column flex-grow-1">
+        <div class="d-flex justify-content-between align-items-start gap-2"><h3 class="h6 mb-1">{{ t.title }}</h3>{% if not t.is_active %}<span class="badge badge-soft-secondary">Hidden</span>{% endif %}</div>
+        <div class="small text-muted-2 mb-3">{{ t.destination }} · {{ t.duration_days }} days · max {{ t.max_group_size }}</div>
+        <div class="row text-center g-2 mb-3">
+          <div class="col-4"><div class="bg-surface-2 rounded p-2"><div class="fw-bold">{{ t.n_upcoming }}</div><div class="small text-muted-2">Upcoming</div></div></div>
+          <div class="col-4"><div class="bg-surface-2 rounded p-2"><div class="fw-bold">{{ t.n_travelers|default:0 }}</div><div class="small text-muted-2">Travelers</div></div></div>
+          <div class="col-4"><div class="bg-surface-2 rounded p-2"><div class="fw-bold">{{ t.avg_rating|floatformat:1|default:"-" }}</div><div class="small text-muted-2">Rating</div></div></div>
+        </div>
+        <a class="btn btn-soft btn-sm mt-auto" href="{% url 'guide:tour_detail' t.slug %}">Departures & details</a>
+      </div>
+    </div>
+  </div>
+  {% empty %}<div class="col-12"><div class="panel panel-body text-center text-muted-2 py-5"><i class="bi bi-map fs-1 d-block mb-2"></i>No tours assigned yet. The office will assign tours to you.</div></div>{% endfor %}
+</div>
+{% endblock %}

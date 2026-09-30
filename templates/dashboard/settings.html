@@ -1,0 +1,74 @@
+{% extends "dashboard/_base.html" %}
+{% block title %}Customization{% endblock %}
+{% block page_title %}Customization{% endblock %}
+{% block topbar_actions %}<a class="btn btn-light btn-sm d-none d-sm-inline-block" href="{% url 'core:home' %}" target="_blank"><i class="bi bi-box-arrow-up-right"></i> Preview site</a>{% endblock %}
+{% block content %}
+<form method="post" enctype="multipart/form-data" novalidate>{% csrf_token %}
+  {% include "partials/_form_errors.html" %}
+  <div class="row g-3">
+    <div class="col-lg-3">
+      <div class="panel p-2 settings-nav nav flex-column nav-pills" role="tablist">
+        {% for section in form.sections %}
+        <button type="button" class="nav-link {% if forloop.first %}active{% endif %}" data-bs-toggle="pill" data-bs-target="#tab-{{ section.key }}" id="nav-{{ section.key }}"><i class="bi {{ section.icon }}"></i> {{ section.title }}{% for f in section.fields %}{% if f.errors %} <i class="bi bi-exclamation-circle-fill text-danger ms-auto"></i>{% endif %}{% endfor %}</button>
+        {% endfor %}
+      </div>
+      <div class="panel mt-3 p-3 small">
+        <div class="small-caps text-muted-2 mb-2">Chatbot engine</div>
+        {% if groq_enabled %}<span class="badge badge-soft-success"><i class="bi bi-lightning-charge-fill"></i> Groq · {{ groq_model }}</span>
+        {% else %}<span class="badge badge-soft-warning">Offline assistant</span><div class="text-muted-2 mt-2">Add <code>GROQ_API_KEY</code> to <code>.env</code> to enable the AI model.</div>{% endif %}
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="panel tab-content">
+        {% for section in form.sections %}
+        <div class="tab-pane fade {% if forloop.first %}show active{% endif %}" id="tab-{{ section.key }}">
+          <div class="panel-head"><h2><i class="bi {{ section.icon }} text-brand me-1"></i> {{ section.title }}</h2></div>
+          <div class="panel-body">
+            {% for field in section.fields %}{% include "partials/_field.html" %}{% endfor %}
+          </div>
+        </div>
+        {% endfor %}
+        <div class="panel-head border-top border-bottom-0 justify-content-end"><button class="btn btn-primary"><i class="bi bi-check2"></i> Save changes</button></div>
+      </div>
+    </div>
+    <div class="col-lg-3">
+      <div class="panel position-sticky" style="top:90px">
+        <div class="panel-head"><h2>Live preview</h2></div>
+        <div class="panel-body">
+          <div class="preview-box" id="preview">
+            <div class="p-hero" data-p="hero"><div class="fw-bold mb-1" data-p="name">{{ site.site_name }}</div><div class="small opacity-75" data-p="title">{{ site.hero_title }}</div></div>
+            <div class="p-3 d-flex gap-2 flex-wrap"><span class="btn btn-sm" data-p="btn">Primary</span><span class="btn btn-sm" data-p="btn2">Accent</span></div>
+          </div>
+          <p class="small text-muted-2 mt-3 mb-0">Colors, font and radius apply to the public site and both dashboards immediately after saving.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</form>
+{% endblock %}
+{% block extra_js %}
+<script>
+(() => {
+  const $ = (id) => document.getElementById(id);
+  const q = (k) => document.querySelector(`#preview [data-p="${k}"]`);
+  function paint() {
+    const brand = $("id_primary_color").value, accent = $("id_secondary_color").value, ink = $("id_dark_color").value;
+    const radius = ($("id_border_radius").value || 0) + "px";
+    q("hero").style.background = `linear-gradient(120deg, ${ink}, ${brand})`;
+    q("hero").style.borderRadius = `${radius} ${radius} 0 0`;
+    Object.assign(q("btn").style, { background: brand, color: "#fff", borderRadius: radius });
+    Object.assign(q("btn2").style, { background: accent, color: "#1f1300", borderRadius: radius });
+    $("preview").style.borderRadius = radius;
+    $("preview").style.fontFamily = `"${$("id_font_family").value}", sans-serif`;
+    q("name").textContent = $("id_site_name").value;
+    q("title").textContent = $("id_hero_title").value;
+  }
+  ["id_primary_color", "id_secondary_color", "id_dark_color", "id_border_radius", "id_font_family", "id_site_name", "id_hero_title"]
+    .forEach((id) => $(id)?.addEventListener("input", paint));
+  paint();
+  // Open the tab from the URL hash (e.g. #chatbot) or the first tab with an error.
+  const target = document.querySelector(".settings-nav .text-danger")?.closest("button") || (location.hash && $("nav-" + location.hash.slice(1)));
+  if (target) bootstrap.Tab.getOrCreateInstance(target).show();
+})();
+</script>
+{% endblock %}

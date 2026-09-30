@@ -1,0 +1,35 @@
+{% extends "guide/_base.html" %}
+{% load ui %}
+{% block title %}{{ tour.title }}{% endblock %}
+{% block crumbs %}Guide / <a href="{% url 'guide:tours' %}">My tours</a>{% endblock %}
+{% block page_title %}{{ tour.title }}{% endblock %}
+{% block topbar_actions %}<a class="btn btn-light btn-sm d-none d-sm-inline-block" href="{{ tour.get_absolute_url }}" target="_blank"><i class="bi bi-box-arrow-up-right"></i> Public page</a>{% endblock %}
+{% block content %}
+<div class="row g-3">
+  <div class="col-xl-7">
+    <div class="panel mb-3"><div class="panel-head"><h2>Upcoming departures</h2><span class="sub">Capacity {{ tour.max_group_size }} per departure</span></div>
+      {% for d in departures %}
+      <div class="list-row">
+        <div class="date-tile"><div class="d">{{ d.travel_date|date:"d" }}</div><div class="m">{{ d.travel_date|date:"M" }}</div></div>
+        <div class="grow"><div class="title">{{ d.travel_date|date:"l, M d Y" }}</div>
+          <div class="d-flex align-items-center gap-2"><div class="progress progress-thin flex-grow-1" style="max-width:220px"><div class="progress-bar" style="width:{% widthratio d.travelers tour.max_group_size 100 %}%"></div></div><span class="sub">{{ d.travelers }}/{{ tour.max_group_size }} · {{ d.groups }} booking{{ d.groups|pluralize }}</span></div></div>
+        <a class="btn btn-sm btn-soft" href="{% url 'guide:manifest' tour.slug d.travel_date|date:'Y-m-d' %}"><i class="bi bi-list-check"></i> Manifest</a>
+      </div>
+      {% empty %}<div class="panel-body text-muted-2">No upcoming departures.</div>{% endfor %}
+    </div>
+    <div class="panel"><div class="panel-head"><h2>Recent reviews</h2></div>
+      {% for r in reviews %}<div class="list-row align-items-start"><span class="avatar">{{ r.user|initials }}</span><div class="grow"><div class="d-flex justify-content-between"><strong class="small">{{ r.user.get_full_name }}</strong><span class="rating">{% for s in r.rating|stars %}<i class="bi {{ s }}"></i>{% endfor %}</span></div><p class="small mb-0">{{ r.comment }}</p></div></div>
+      {% empty %}<div class="panel-body text-muted-2">No reviews yet.</div>{% endfor %}
+    </div>
+  </div>
+  <div class="col-xl-5">
+    <div class="panel overflow-hidden"><img src="{{ tour.cover }}" class="w-100" style="aspect-ratio:16/9;object-fit:cover" alt="">
+      <div class="panel-body">
+        <p class="small">{{ tour.summary }}</p>
+        {% if tour.itinerary_list %}<div class="small-caps text-muted-2 mb-2">Itinerary</div><ol class="small ps-3">{% for d in tour.itinerary_list %}<li class="mb-1">{{ d }}</li>{% endfor %}</ol>{% endif %}
+        {% if tour.included_list %}<div class="small-caps text-muted-2 mb-2">Included</div><ul class="small ps-3 mb-0">{% for d in tour.included_list %}<li>{{ d }}</li>{% endfor %}</ul>{% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

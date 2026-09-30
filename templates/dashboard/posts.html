@@ -1,0 +1,16 @@
+{% extends "dashboard/_base.html" %}
+{% block title %}Blog{% endblock %}
+{% block page_title %}Blog articles{% endblock %}
+{% block topbar_actions %}<a class="btn btn-primary btn-sm" href="{% url 'dashboard:post_create' %}"><i class="bi bi-plus-lg"></i> New article</a>{% endblock %}
+{% block content %}
+<div class="panel"><div class="table-responsive"><table class="table table-dash">
+  <thead><tr><th>Article</th><th>Author</th><th>Comments</th><th>Status</th><th>Date</th><th></th></tr></thead>
+  <tbody>{% for p in page %}
+    <tr><td><div class="d-flex align-items-center gap-3"><img class="thumb" src="{{ p.cover }}" alt=""><div><div class="title">{{ p.title|truncatechars:50 }}</div><div class="sub">{{ p.category|default:"Uncategorised" }}</div></div></div></td>
+      <td>{{ p.author.get_full_name|default:p.author.username }}</td><td>{{ p.n_comments }}</td>
+      <td>{% if p.is_published %}<span class="badge badge-soft-success">Published</span>{% else %}<span class="badge badge-soft-secondary">Draft</span>{% endif %}</td>
+      <td>{{ p.created_at|date:"M d, Y" }}</td>
+      <td class="text-end text-nowrap"><a class="btn btn-sm btn-light" href="{{ p.get_absolute_url }}" target="_blank"><i class="bi bi-eye"></i></a> <a class="btn btn-sm btn-light" href="{% url 'dashboard:post_edit' p.pk %}"><i class="bi bi-pencil"></i></a> <a class="btn btn-sm btn-light text-danger" href="{% url 'dashboard:post_delete' p.pk %}"><i class="bi bi-trash"></i></a></td></tr>
+  {% empty %}<tr><td colspan="6" class="text-center text-muted-2 py-5">No articles yet.</td></tr>{% endfor %}</tbody>
+</table></div>{% include "partials/_pagination.html" with pagination_class="py-3" %}</div>
+{% endblock %}

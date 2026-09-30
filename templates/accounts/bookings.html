@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load ui %}
+{% block title %}My bookings{% endblock %}
+{% block content %}
+{% include "partials/_page_hero.html" with title="My bookings" subtitle="Track, review and manage your trips." %}
+<section class="section">
+  <div class="container">
+    {% for b in bookings %}
+    <div class="card mb-3 overflow-hidden">
+      <div class="row g-0 align-items-center">
+        <div class="col-md-3"><img src="{{ b.tour.cover }}" class="w-100 h-100 object-fit-cover" style="min-height:150px;max-height:170px" alt=""></div>
+        <div class="col-md-9 p-4">
+          <div class="d-flex flex-wrap justify-content-between gap-2 mb-2">
+            <div><span class="font-monospace small text-muted-2">{{ b.reference }}</span><h3 class="h5 mb-0"><a class="text-body" href="{{ b.tour.get_absolute_url }}">{{ b.tour.title }}</a></h3></div>
+            <div><span class="badge badge-soft-{{ b.status|status_color }}">{{ b.get_status_display }}</span> <span class="badge badge-soft-{{ b.payment_status|status_color }}">{{ b.get_payment_status_display }}</span></div>
+          </div>
+          <div class="d-flex flex-wrap gap-4 small text-muted-2 mb-3">
+            <span><i class="bi bi-calendar3"></i> {{ b.travel_date|date:"D, M d Y" }}</span>
+            <span><i class="bi bi-people"></i> {{ b.travelers }} traveler{{ b.travelers|pluralize }}</span>
+            <span><i class="bi bi-geo-alt"></i> {{ b.tour.destination.name }}</span>
+            <span class="fw-600 text-brand">{{ b.total_price|money:site.currency_symbol }}</span>
+          </div>
+          <div class="d-flex gap-2">
+            <a class="btn btn-sm btn-outline-primary" href="{{ b.tour.get_absolute_url }}">View tour</a>
+            {% if b.status == 'completed' %}<a class="btn btn-sm btn-soft" href="{{ b.tour.get_absolute_url }}#reviews">Write a review</a>{% endif %}
+            {% if b.can_cancel %}<form method="post" action="{% url 'accounts:cancel_booking' b.reference %}" onsubmit="return confirm('Cancel this booking?')">{% csrf_token %}<button class="btn btn-sm btn-outline-danger">Cancel</button></form>{% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+    {% empty %}
+    <div class="empty-state"><i class="bi bi-suitcase2"></i><h4 class="text-body mt-3">No bookings yet</h4><p>Your next adventure is a few clicks away.</p><a class="btn btn-primary" href="{% url 'tours:list' %}">Browse tours</a></div>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

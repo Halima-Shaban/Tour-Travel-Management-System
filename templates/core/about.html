@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}About us{% endblock %}
+{% block content %}
+{% include "partials/_page_hero.html" with title="About us" subtitle=site.tagline %}
+<section class="section">
+  <div class="container">
+    <div class="row g-5 align-items-center">
+      <div class="col-lg-6"><img class="img-fluid rounded-brand shadow" src="https://picsum.photos/seed/gotrip-about/900/700" alt="Our team on tour"></div>
+      <div class="col-lg-6">
+        <span class="small-caps text-brand">Our story</span>
+        <h2 class="mt-2 mb-3">{{ site.about_title }}</h2>
+        <p class="text-muted-2">{{ site.about_text }}</p>
+        <ul class="check-list mt-4">
+          <li>Every guide is licensed, background-checked and trained in first aid.</li>
+          <li>Transparent pricing - what you see is what you pay.</li>
+          <li>Responsible travel: local partners, small groups, fair wages.</li>
+        </ul>
+        <a class="btn btn-primary mt-3" href="{% url 'tours:list' %}">Browse tours</a>
+      </div>
+    </div>
+  </div>
+</section>
+<section class="section bg-surface-2">
+  <div class="container">
+    <div class="section-title text-center"><span class="small-caps eyebrow">How it works</span><h2>Book in three simple steps</h2></div>
+    <div class="row g-4 text-center">
+      <div class="col-md-4"><div class="feature"><span class="icon-circle"><i class="bi bi-search"></i></span><h5>1. Pick a tour</h5><p class="text-muted-2 mb-0">Filter by destination, budget or trip length - or just ask our assistant.</p></div></div>
+      <div class="col-md-4"><div class="feature"><span class="icon-circle"><i class="bi bi-calendar-check"></i></span><h5>2. Choose a date</h5><p class="text-muted-2 mb-0">See live availability and get your booking reference instantly.</p></div></div>
+      <div class="col-md-4"><div class="feature"><span class="icon-circle"><i class="bi bi-emoji-smile"></i></span><h5>3. Enjoy the trip</h5><p class="text-muted-2 mb-0">Your guide confirms the details and meets you on day one.</p></div></div>
+    </div>
+  </div>
+</section>
+{% endblock %}

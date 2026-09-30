@@ -1,0 +1,7 @@
+<section class="page-hero" style="background-image:url('{{ hero_image|default:site.hero_background }}')">
+  <div class="container">
+    <nav aria-label="breadcrumb"><ol class="breadcrumb mb-2"><li class="breadcrumb-item"><a href="{% url 'core:home' %}">Home</a></li>{% if crumb_url %}<li class="breadcrumb-item"><a href="{{ crumb_url }}">{{ crumb_label }}</a></li>{% endif %}<li class="breadcrumb-item active">{{ title }}</li></ol></nav>
+    <h1 class="display-6 mb-2">{{ title }}</h1>
+    {% if subtitle %}<p class="lead mb-0 opacity-75">{{ subtitle }}</p>{% endif %}
+  </div>
+</section>

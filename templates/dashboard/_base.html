@@ -1,0 +1,27 @@
+{% extends "dash_base.html" %}
+{% load ui %}
+{% block home_url %}{% url 'dashboard:home' %}{% endblock %}
+{% block role_label %}Admin{% endblock %}
+{% block crumbs %}Admin{% endblock %}
+{% block sidebar %}
+{% admin_counts as counts %}
+<div class="group">Overview</div>
+<a class="{% active 'dashboard:home' exact=True %}" href="{% url 'dashboard:home' %}"><i class="bi bi-grid-1x2"></i> Dashboard</a>
+<a class="{% active 'dashboard:bookings' %}" href="{% url 'dashboard:bookings' %}"><i class="bi bi-calendar-check"></i> Bookings{% if counts.pending %}<span class="count">{{ counts.pending }}</span>{% endif %}</a>
+<div class="group">Catalogue</div>
+<a class="{% active 'dashboard:tours' %}" href="{% url 'dashboard:tours' %}"><i class="bi bi-map"></i> Tours</a>
+<a class="{% active 'dashboard:destinations' %}" href="{% url 'dashboard:destinations' %}"><i class="bi bi-geo-alt"></i> Destinations</a>
+<a class="{% active 'dashboard:reviews' %}" href="{% url 'dashboard:reviews' %}"><i class="bi bi-star"></i> Reviews</a>
+<div class="group">People</div>
+<a class="{% active 'dashboard:guides' %}" href="{% url 'dashboard:guides' %}"><i class="bi bi-person-badge"></i> Guides</a>
+<a class="{% active 'dashboard:users' %}" href="{% url 'dashboard:users' %}"><i class="bi bi-people"></i> Users</a>
+<div class="group">Engagement</div>
+<a class="{% active 'dashboard:messages' %}" href="{% url 'dashboard:messages' %}"><i class="bi bi-envelope"></i> Inbox{% if counts.unread %}<span class="count">{{ counts.unread }}</span>{% endif %}</a>
+<a class="{% active 'dashboard:chats' %}" href="{% url 'dashboard:chats' %}"><i class="bi bi-robot"></i> Chatbot logs</a>
+<a class="{% active 'dashboard:subscribers' %}" href="{% url 'dashboard:subscribers' %}"><i class="bi bi-megaphone"></i> Subscribers</a>
+<a class="{% active 'dashboard:posts' %}" href="{% url 'dashboard:posts' %}"><i class="bi bi-journal-richtext"></i> Blog</a>
+<div class="group">System</div>
+<a class="{% active 'dashboard:settings' %}" href="{% url 'dashboard:settings' %}"><i class="bi bi-sliders"></i> Customization</a>
+<a href="{% url 'admin:index' %}"><i class="bi bi-database-gear"></i> Django admin</a>
+{% endblock %}
+{% block user_menu %}<li><a class="dropdown-item" href="{% url 'dashboard:settings' %}"><i class="bi bi-sliders me-2"></i>Customization</a></li>{% endblock %}

@@ -1,0 +1,16 @@
+{% extends "guide/_base.html" %}
+{% block title %}Manifest{% endblock %}
+{% block crumbs %}Guide / <a href="{% url 'guide:tour_detail' tour.slug %}">{{ tour.title }}</a>{% endblock %}
+{% block page_title %}Passenger manifest{% endblock %}
+{% block topbar_actions %}<button class="btn btn-primary btn-sm" onclick="window.print()"><i class="bi bi-printer"></i> Print</button>{% endblock %}
+{% block content %}
+<div class="panel">
+  <div class="panel-head"><div><h2>{{ tour.title }}</h2><div class="sub">{{ date|date:"l, F d Y" }} · {{ tour.duration_days }} day{{ tour.duration_days|pluralize }} · guide {{ user.get_full_name }}</div></div><div class="text-end"><div class="fs-4 fw-bold">{{ total }} / {{ tour.max_group_size }}</div><div class="sub">travelers</div></div></div>
+  <div class="table-responsive"><table class="table table-dash">
+    <thead><tr><th>#</th><th>Lead traveler</th><th>Contact</th><th>Pax</th><th>Reference</th><th>Status</th><th>Payment</th><th>Requests</th></tr></thead>
+    <tbody>{% for b in bookings %}
+      <tr><td>{{ forloop.counter }}</td><td class="title">{{ b.full_name }}</td><td><div>{{ b.phone }}</div><div class="sub">{{ b.email }}</div></td><td>{{ b.travelers }}</td><td class="font-monospace">{{ b.reference }}</td><td>{{ b.get_status_display }}</td><td>{{ b.get_payment_status_display }}</td><td class="small">{{ b.special_requests|default:"-" }}</td></tr>
+    {% empty %}<tr><td colspan="8" class="text-center text-muted-2 py-5">No travelers booked on this date.</td></tr>{% endfor %}</tbody>
+  </table></div>
+</div>
+{% endblock %}

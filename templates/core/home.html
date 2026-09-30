@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% load ui humanize %}
+{% block title %}{{ site.tagline }}{% endblock %}
+{% block nav_class %}{% endblock %}
+{% block content %}
+<section class="hero" style="background-image:url('{{ site.hero_background }}')">
+  <div class="container">
+    <span class="hero-badge mb-4"><i class="bi bi-patch-check-fill text-accent"></i> Trusted by {{ stats.travelers|intcomma }}+ travelers</span>
+    <h1 class="mb-3">{{ site.hero_title }}</h1>
+    <p class="lead mb-5">{{ site.hero_subtitle }}</p>
+    <form class="search-panel" action="{% url 'tours:list' %}" method="get">
+      <div class="row g-2">
+        <div class="col-md-5"><div class="position-relative"><i class="bi bi-search position-absolute text-muted-2" style="left:16px;top:16px"></i><input type="text" name="q" class="form-control ps-5" placeholder="Where do you want to go?"></div></div>
+        <div class="col-6 col-md-3">{{ search_form.category }}</div>
+        <div class="col-6 col-md-2">{{ search_form.duration }}</div>
+        <div class="col-md-2 d-grid"><button class="btn btn-primary"><i class="bi bi-search me-1"></i> Search</button></div>
+      </div>
+    </form>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="section-title d-flex flex-wrap justify-content-between align-items-end gap-3">
+      <div><span class="small-caps eyebrow">Top destinations</span><h2>Where will you go next?</h2><p class="mb-0">Hand-picked places our guides know inside out.</p></div>
+      <a class="btn btn-outline-primary" href="{% url 'tours:destinations' %}">All destinations <i class="bi bi-arrow-right ms-1"></i></a>
+    </div>
+    <div class="row g-4">
+      {% with first=destinations.0 %}{% if first %}
+      <div class="col-lg-6">
+        <a class="dest-card wide" href="{{ first.get_absolute_url }}"><img src="{{ first.cover }}" alt="{{ first.name }}" loading="lazy">
+          <div class="overlay"><small class="opacity-75"><i class="bi bi-geo-alt"></i> {{ first.country }}</small><h3 class="fs-2">{{ first.name }}</h3><small>{{ first.tour_count }} tour{{ first.tour_count|pluralize }}</small></div></a>
+      </div>{% endif %}{% endwith %}
+      <div class="col-lg-6"><div class="row g-4">
+        {% for d in destinations|slice:"1:5" %}
+        <div class="col-6">
+          <a class="dest-card" style="aspect-ratio:4/3" href="{{ d.get_absolute_url }}"><img src="{{ d.cover }}" alt="{{ d.name }}" loading="lazy">
+            <div class="overlay"><small class="opacity-75"><i class="bi bi-geo-alt"></i> {{ d.country }}</small><h3>{{ d.name }}</h3><small>{{ d.tour_count }} tour{{ d.tour_count|pluralize }}</small></div></a>
+        </div>
+        {% endfor %}
+      </div></div>
+    </div>
+  </div>
+</section>
+
+<section class="section bg-surface-2">
+  <div class="container">
+    <div class="section-title text-center"><span class="small-caps eyebrow">Featured tours</span><h2>Our most loved experiences</h2><p>Small groups, expert guides and itineraries tested on the ground.</p></div>
+    <div class="row g-4">
+      {% for tour in featured_tours %}<div class="col-md-6 col-lg-4">{% include "partials/_tour_card.html" %}</div>
+      {% empty %}<div class="empty-state"><i class="bi bi-map"></i><p>No featured tours yet.</p></div>{% endfor %}
+    </div>
+    <div class="text-center mt-5"><a class="btn btn-primary btn-lg" href="{% url 'tours:list' %}">Explore all tours</a></div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <div class="row g-5 align-items-center">
+      <div class="col-lg-5">
+        <span class="small-caps text-brand">Why travel with us</span>
+        <h2 class="mt-2 mb-3">{{ site.about_title }}</h2>
+        <p class="text-muted-2 mb-4">{{ site.about_text }}</p>
+        <a class="btn btn-primary" href="{% url 'core:about' %}">Learn more</a>
+        <a class="btn btn-link text-brand" href="#" data-open-chat><i class="bi bi-chat-dots"></i> Ask our assistant</a>
+      </div>
+      <div class="col-lg-7">
+        <div class="row g-4">
+          <div class="col-sm-6"><div class="feature"><span class="icon-circle"><i class="bi bi-person-badge"></i></span><h5>Certified local guides</h5><p class="text-muted-2 mb-0">Licensed experts who live where you travel.</p></div></div>
+          <div class="col-sm-6"><div class="feature"><span class="icon-circle"><i class="bi bi-shield-check"></i></span><h5>Flexible booking</h5><p class="text-muted-2 mb-0">Free cancellation on most tours. No hidden fees.</p></div></div>
+          <div class="col-sm-6"><div class="feature"><span class="icon-circle"><i class="bi bi-people"></i></span><h5>Small groups</h5><p class="text-muted-2 mb-0">More time with your guide, less time in queues.</p></div></div>
+          <div class="col-sm-6"><div class="feature"><span class="icon-circle"><i class="bi bi-headset"></i></span><h5>24/7 support</h5><p class="text-muted-2 mb-0">Real people (and a smart assistant) whenever you need.</p></div></div>
+        </div>
+      </div>
+    </div>
+    {% if site.show_stats %}
+    <div class="stats-band mt-5">
+      <div class="row text-center g-4">
+        <div class="col-6 col-md-3"><div class="num">{{ stats.tours }}</div><div class="label">Curated tours</div></div>
+        <div class="col-6 col-md-3"><div class="num">{{ stats.destinations }}</div><div class="label">Destinations</div></div>
+        <div class="col-6 col-md-3"><div class="num">{{ stats.travelers|intcomma }}</div><div class="label">Happy travelers</div></div>
+        <div class="col-6 col-md-3"><div class="num">{{ stats.rating }}<small class="fs-5">/5</small></div><div class="label">Average rating</div></div>
+      </div>
+    </div>
+    {% endif %}
+  </div>
+</section>
+
+{% if site.show_testimonials and testimonials %}
+<section class="section bg-surface-2">
+  <div class="container">
+    <div class="section-title text-center"><span class="small-caps eyebrow">Testimonials</span><h2>What travelers say</h2></div>
+    <div class="row g-4">
+      {% for r in testimonials|slice:":3" %}
+      <div class="col-md-4">
+        <div class="testimonial">
+          <div class="d-flex justify-content-between"><span class="quote"><i class="bi bi-quote"></i></span><span class="rating">{% for s in r.rating|stars %}<i class="bi {{ s }}"></i>{% endfor %}</span></div>
+          <p class="my-3">{{ r.comment }}</p>
+          <div class="d-flex align-items-center gap-3"><span class="avatar">{{ r.user|initials }}</span><div><div class="fw-600">{{ r.user.get_full_name|default:r.user.username }}</div><small class="text-muted-2">{{ r.tour.title }}</small></div></div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{% if site.show_blog and posts %}
+<section class="section">
+  <div class="container">
+    <div class="section-title d-flex flex-wrap justify-content-between align-items-end gap-3">
+      <div><span class="small-caps eyebrow">Travel journal</span><h2>Tips & stories from our guides</h2></div>
+      <a class="btn btn-outline-primary" href="{% url 'blog:list' %}">Read the journal</a>
+    </div>
+    <div class="row g-4">{% for post in posts %}<div class="col-md-4">{% include "blog/_card.html" %}</div>{% endfor %}</div>
+  </div>
+</section>
+{% endif %}
+
+<section class="section-sm pb-5">
+  <div class="container">
+    <div class="cta">
+      <div class="row align-items-center g-4">
+        <div class="col-lg-6"><h2 class="mb-2">Get exclusive travel deals</h2><p class="mb-0 opacity-75">Join our newsletter - early-bird offers and new tours, once a month. No spam.</p></div>
+        <div class="col-lg-6">
+          <form class="d-flex gap-2" method="post" action="{% url 'core:newsletter' %}">{% csrf_token %}
+            <input type="email" name="email" class="form-control" placeholder="Your email address" required>
+            <button class="btn btn-accent px-4">Subscribe</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

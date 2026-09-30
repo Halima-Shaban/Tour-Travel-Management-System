@@ -1,0 +1,12 @@
+{% extends "dashboard/_base.html" %}
+{% block title %}Subscribers{% endblock %}
+{% block page_title %}Newsletter subscribers{% endblock %}
+{% block topbar_actions %}<a class="btn btn-soft btn-sm" href="?export=1"><i class="bi bi-download"></i> Export CSV</a>{% endblock %}
+{% block content %}
+<div class="panel" style="max-width:760px">
+  <div class="panel-head"><h2>{{ page.paginator.count }} subscribers</h2></div>
+  {% for s in page %}<div class="list-row"><span class="icon-circle tone-brand" style="width:36px;height:36px"><i class="bi bi-envelope"></i></span><div class="grow"><div class="title">{{ s.email }}</div></div><span class="sub">{{ s.created_at|date:"M d, Y" }}</span></div>
+  {% empty %}<div class="panel-body text-muted-2">No subscribers yet.</div>{% endfor %}
+  {% include "partials/_pagination.html" with pagination_class="py-3" %}
+</div>
+{% endblock %}

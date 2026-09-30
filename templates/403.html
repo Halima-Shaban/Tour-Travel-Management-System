@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% block title %}Access denied{% endblock %}
+{% block content %}
+<section class="section" style="padding-top:10rem"><div class="container empty-state">
+  <i class="bi bi-shield-lock"></i><h1 class="display-5 fw-bold text-body mt-3">Access denied</h1><p class="lead">Your account doesn't have permission to view this page.</p>
+  <a class="btn btn-primary" href="{% url 'core:home' %}">Back to home</a>
+</div></section>
+{% endblock %}

@@ -1,78 +1,60 @@
-# GoTrip - Django project
+# GoTrip - Tour & Travel Management System
 
-A full-stack Django port of the GoTrip travel UI (originally a static Colorlib
-HTML template). The theme's HTML/CSS/JS is untouched in `static/`; everything
-dynamic (tours, blog, contact form, accounts) is wired up through real Django
-models, views and templates.
+A complete Django platform for tour operators: a modern public booking website, an **admin
+dashboard**, a **tour-guide dashboard**, live **no-code customization** and an **AI travel
+assistant** powered by Groq.
 
-## What's included
+## Features
 
-| App        | Responsible for |
-|------------|------------------|
-| `core`     | Home, About, Elements pages; the contact form and newsletter signup; site-wide settings (name/email/phone shown in header, footer, contact page) |
-| `tours`    | "Favourite Places" cards on the home page and the `/packages/` listing, with search + duration filter |
-| `blog`     | Posts, categories, tags, authors, comments, sidebar widgets |
-| `accounts` | Sign in / sign up on the theme's dedicated auth page, using Django's built-in User model |
+| Area | Highlights |
+|------|------------|
+| **Public site** | Hero search, destinations, tour listing with filters/sorting, tour pages (itinerary, guide, reviews, live price), booking with capacity checks, customer accounts (track/cancel bookings), blog, contact, newsletter, dark mode, fully responsive |
+| **Admin dashboard** `/dashboard/` | KPIs & trends, revenue/booking/status/destination charts, bookings workflow + CSV export, tours/destinations/blog CRUD, guide management & performance, users & roles, review moderation, inbox, subscribers, chatbot logs |
+| **Guide dashboard** `/guide/` | Next departure, schedule calendar, bookings of *their* tours only, confirm/complete + private notes, printable passenger manifests, reviews & rating breakdown, public profile |
+| **Customization** `/dashboard/settings/` | Name, logo, colours, font, corner radius, home-page content & sections, contact/social links, currency, booking on/off, cancellation policy, chatbot persona - live preview, no code |
+| **Chatbot** | Groq LLM (Llama 3.3 70B + automatic fallback model) grounded on your real tours and policies, replies in the visitor's language, tour cards, rate limiting, offline database-backed mode when no key/network |
 
-Everything is manageable from `/admin/`.
-
-## Getting started
+## Quick start
 
 ```bash
-python -m venv .venv
-source .venv/bin/activate        # Windows: .venv\Scripts\activate
+python -m venv .venv && source .venv/bin/activate   # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
-
-cp .env.example .env              # adjust if you like; defaults work as-is
-
+cp .env.example .env            # put your GROQ_API_KEY here to enable the AI chatbot
 python manage.py migrate
-python manage.py seed_demo_data   # creates sample tours/posts + an admin user
+python manage.py seed_demo_data
 python manage.py runserver
 ```
 
-Visit http://127.0.0.1:8000/. The seed command prints an admin username and
-password (`admin` / `admin12345`) - **change this before deploying**, or just
-run `python manage.py createsuperuser` instead.
+| Role | Login | Lands on |
+|------|-------|----------|
+| Admin | `admin` / `admin12345` | `/dashboard/` |
+| Guide | `guide` / `guide12345` | `/guide/` |
+| Customer | `customer` / `customer12345` | `/account/bookings/` |
 
-## Configuration (`.env`)
+Change these before deploying. Tests: `python manage.py test tests`.
 
-All settings have working defaults for local development. See
-`.env.example` for the full list. The notable ones:
+## Documentation
 
-- `SITE_*` - name, email, phone, address shown across the site.
-- `CONTACT_RECIPIENT_EMAIL` / `EMAIL_*` - if unset, contact-form and comment
-  notifications aren't emailed anywhere but every submission is still saved
-  and visible in `/admin/`. Console backend prints outgoing mail to the
-  terminal in development.
-- `GOOGLE_MAPS_API_KEY` - optional. Without it, the contact page shows a free
-  OpenStreetMap embed instead of the theme's styled Google map.
-
-## Notes on the conversion
-
-- The original template's `contact_process.php` mailed a hard-coded address
-  and its contact page had a saved Google Maps snapshot with the template
-  author's own API key baked in. Neither was carried over: the contact form
-  now saves to the database (and optionally emails whoever you configure),
-  and the map key is your own, supplied via `.env`.
-- A few assets referenced by the original HTML (`gijgo.min.js`,
-  `site.webmanifest`, a couple of background images) weren't present in the
-  archive and aren't used by any page, so they were left out.
-- Uploaded tour/blog images fall back to the theme's own placeholder images
-  when nothing has been uploaded yet, so cards never look broken.
-- `frontend_src/scss/` holds the theme's original Sass source, kept for
-  reference if you want to customise colours/fonts - it isn't compiled or
-  served; `static/css/style.css` is the compiled CSS actually in use.
+Full docs live in [`docs/`](docs/README.md): [installation](docs/installation.md) ·
+[configuration](docs/configuration.md) · [customization](docs/customization.md) ·
+[admin dashboard](docs/admin-dashboard.md) · [guide dashboard](docs/guide-dashboard.md) ·
+[chatbot](docs/chatbot.md) · [architecture](docs/architecture.md) · [deployment](docs/deployment.md)
 
 ## Project layout
 
 ```
-config/            settings, root urls
-core/               home/about/elements/contact/newsletter
-tours/              tour packages
-blog/               posts, comments, sidebar
-accounts/           login/signup (theme's auth.html)
-templates/          base.html, partials/, and one folder per app
-static/             the GoTrip theme (css/js/img/fonts) + auth page assets
-media/              uploaded images (created at runtime)
-frontend_src/scss/  original Sass source (reference only)
+config/      settings (env driven) & URLs
+core/        site settings/customization, home/about/contact, newsletter, shared helpers
+accounts/    roles (Profile), auth, customer bookings, permission helpers
+tours/       destinations, tours, bookings, reviews
+blog/        posts, categories, comments
+dashboard/   admin dashboard + analytics
+guide/       guide dashboard
+chatbot/     AI assistant (Groq + offline engine)
+templates/   page templates and partials
+static/      design tokens, site/dashboard/chatbot CSS, JS
+tests/       test suite
+docs/        documentation
 ```
+
+Tech: Django 5.1 · Bootstrap 5.3 · Chart.js 4 · FullCalendar 6 · Groq API. No front-end build step.

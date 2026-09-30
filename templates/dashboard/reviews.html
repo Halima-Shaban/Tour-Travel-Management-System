@@ -1,0 +1,27 @@
+{% extends "dashboard/_base.html" %}
+{% load ui %}
+{% block title %}Reviews{% endblock %}
+{% block page_title %}Reviews{% endblock %}
+{% block content %}
+<div class="chip-tabs mb-3">
+  <a class="{% if not request.GET.state %}active{% endif %}" href="?">All</a>
+  <a class="{% if request.GET.state == 'approved' %}active{% endif %}" href="?state=approved">Published</a>
+  <a class="{% if request.GET.state == 'hidden' %}active{% endif %}" href="?state=hidden">Hidden</a>
+</div>
+<div class="panel">
+  {% for r in page %}
+  <div class="list-row align-items-start">
+    <span class="avatar">{{ r.user|initials }}</span>
+    <div class="grow">
+      <div class="d-flex flex-wrap gap-2 align-items-center"><strong>{{ r.user.get_full_name|default:r.user.username }}</strong><span class="rating">{% for s in r.rating|stars %}<i class="bi {{ s }}"></i>{% endfor %}</span><span class="sub">on <a href="{{ r.tour.get_absolute_url }}" target="_blank">{{ r.tour.title }}</a> · {{ r.created_at|date:"M d, Y" }}</span></div>
+      <p class="mb-0 mt-1 small">{{ r.comment }}</p>
+    </div>
+    <form method="post" action="{% url 'dashboard:review_action' r.pk %}" class="d-flex gap-2">{% csrf_token %}
+      <button class="btn btn-sm {% if r.is_approved %}btn-light{% else %}btn-soft{% endif %}" name="action" value="toggle">{% if r.is_approved %}<i class="bi bi-eye-slash"></i> Hide{% else %}<i class="bi bi-eye"></i> Publish{% endif %}</button>
+      <button class="btn btn-sm btn-light text-danger" name="action" value="delete" onclick="return confirm('Delete this review?')"><i class="bi bi-trash"></i></button>
+    </form>
+  </div>
+  {% empty %}<div class="panel-body text-center text-muted-2">No reviews.</div>{% endfor %}
+  {% include "partials/_pagination.html" with pagination_class="py-3" %}
+</div>
+{% endblock %}

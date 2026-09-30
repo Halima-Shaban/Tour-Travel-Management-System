@@ -1,0 +1,37 @@
+{% extends "dashboard/_base.html" %}
+{% load ui %}
+{% block title %}Booking {{ object.reference }}{% endblock %}
+{% block crumbs %}Admin / <a href="{{ back_url }}">Bookings</a>{% endblock %}
+{% block page_title %}Booking {{ object.reference }}{% endblock %}
+{% block content %}
+<div class="row g-3">
+  <div class="col-xl-8">
+    <form method="post" novalidate class="panel">{% csrf_token %}
+      <div class="panel-head"><h2>Booking details</h2><span class="badge badge-soft-{{ object.status|status_color }}">{{ object.get_status_display }}</span></div>
+      <div class="panel-body">
+        {% include "partials/_form_errors.html" %}
+        <div class="row">{% for field in form %}<div class="{% if field.field.widget.attrs.rows %}col-12{% else %}col-md-6{% endif %}">{% include "partials/_field.html" %}</div>{% endfor %}</div>
+      </div>
+      <div class="panel-head border-top border-bottom-0 justify-content-end"><a class="btn btn-light" href="{{ back_url }}">Back</a><button class="btn btn-primary">Save changes</button></div>
+    </form>
+  </div>
+  <div class="col-xl-4 d-flex flex-column gap-3">
+    <div class="panel overflow-hidden"><img src="{{ object.tour.cover }}" class="w-100" style="aspect-ratio:16/8;object-fit:cover" alt="">
+      <div class="panel-body">
+        <div class="fw-600">{{ object.tour.title }}</div>
+        <div class="small text-muted-2 mb-3">{{ object.tour.destination }} · {{ object.tour.duration_days }} days</div>
+        <div class="d-flex justify-content-between small mb-1"><span class="text-muted-2">Dates</span><span>{{ object.travel_date|date:"M d" }} → {{ object.end_date|date:"M d, Y" }}</span></div>
+        <div class="d-flex justify-content-between small mb-1"><span class="text-muted-2">Unit price</span><span>{{ object.unit_price|money:site.currency_symbol }}</span></div>
+        <div class="d-flex justify-content-between small mb-1"><span class="text-muted-2">Travelers</span><span>× {{ object.travelers }}</span></div>
+        <div class="d-flex justify-content-between fw-600 border-top pt-2 mt-2"><span>Total</span><span class="text-brand">{{ object.total_price|money:site.currency_symbol }}</span></div>
+      </div>
+    </div>
+    <div class="panel"><div class="panel-head"><h2>Guide</h2>{% if object.tour.guide %}<a class="small" href="{% url 'dashboard:user_edit' object.tour.guide.pk %}">Profile</a>{% endif %}</div>
+      <div class="panel-body">{% if object.tour.guide %}<div class="d-flex gap-3 align-items-center"><span class="avatar">{{ object.tour.guide|initials }}</span><div><div class="fw-600">{{ object.tour.guide.get_full_name }}</div><div class="small text-muted-2">{{ object.tour.guide.email }}</div></div></div>
+        {% if object.guide_notes %}<div class="mt-3 small bg-surface-2 p-3 rounded"><div class="small-caps text-muted-2 mb-1">Guide notes</div>{{ object.guide_notes|linebreaksbr }}</div>{% endif %}
+        {% else %}<p class="small text-muted-2 mb-2">No guide assigned to this tour.</p><a class="btn btn-sm btn-soft" href="{% url 'dashboard:tour_edit' object.tour.pk %}">Assign a guide</a>{% endif %}</div>
+    </div>
+    <div class="panel"><div class="panel-body small text-muted-2">Created {{ object.created_at|date:"M d, Y H:i" }}<br>Updated {{ object.updated_at|timesince }} ago{% if object.user %}<br>Account: <a href="{% url 'dashboard:user_edit' object.user.pk %}">{{ object.user.username }}</a>{% else %}<br>Guest booking{% endif %}</div></div>
+  </div>
+</div>
+{% endblock %}
