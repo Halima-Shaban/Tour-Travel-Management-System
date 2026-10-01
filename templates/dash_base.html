@@ -1,4 +1,4 @@
-{% load static %}<!doctype html>
+{% load static notify %}<!doctype html>
 <html lang="en">
 <head>
   {% include "partials/_head.html" %}
@@ -27,6 +27,7 @@
         <h1 class="text-truncate">{% block page_title %}{% endblock %}</h1>
       </div>
       {% block topbar_actions %}{% endblock %}
+      {% notification_bell %}
       <button class="icon-btn" onclick="toggleTheme()" aria-label="Toggle dark mode"><i class="bi bi-circle-half"></i></button>
       <div class="dropdown">
         <button class="btn p-0 border-0 d-flex align-items-center gap-2" data-bs-toggle="dropdown">

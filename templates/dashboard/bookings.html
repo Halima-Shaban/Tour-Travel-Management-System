@@ -5,7 +5,8 @@
 {% block topbar_actions %}<a class="btn btn-soft btn-sm" href="{% url 'dashboard:booking_export' %}{% query page=None %}"><i class="bi bi-download"></i> Export CSV</a>{% endblock %}
 {% block content %}
 <div class="chip-tabs mb-3">
-  <a class="{% if not request.GET.status %}active{% endif %}" href="{% query status=None page=None %}">All<span class="n">{{ total }}</span></a>
+  <a class="{% if not request.GET.status and not request.GET.guide %}active{% endif %}" href="{% query status=None guide=None page=None %}">All<span class="n">{{ total }}</span></a>
+  <a class="{% if request.GET.guide == 'needs' %}active{% endif %}" href="{% query guide='needs' status=None page=None %}"><i class="bi bi-exclamation-triangle"></i> Needs guide<span class="n">{{ needs_guide }}</span></a>
   {% for v, l in statuses %}<a class="{% if request.GET.status == v %}active{% endif %}" href="{% query status=v page=None %}">{{ l }}<span class="n">{% for k, n in counts.items %}{% if k == v %}{{ n }}{% endif %}{% endfor %}</span></a>{% endfor %}
 </div>
 <div class="panel">
@@ -24,7 +25,7 @@
       <tr>
         <td><a class="font-monospace fw-600" href="{% url 'dashboard:booking_edit' b.pk %}">{{ b.reference }}</a><div class="sub">{{ b.created_at|date:"M d" }}</div></td>
         <td><div class="title">{{ b.full_name }}</div><div class="sub">{{ b.email }}</div></td>
-        <td><div>{{ b.tour.title|truncatechars:30 }}</div><div class="sub">{{ b.tour.guide.get_full_name|default:"No guide" }}</div></td>
+        <td><div>{{ b.tour.title|truncatechars:30 }}</div><div class="sub">{% if b.guide %}{{ b.guide.get_full_name }} · <span class="{% if b.guide_status == 'accepted' %}text-success{% elif b.guide_status == 'declined' %}text-danger{% else %}text-warning{% endif %}">{{ b.get_guide_status_display|lower }}</span>{% else %}<span class="text-danger">No guide</span>{% endif %}</div></td>
         <td class="text-nowrap">{{ b.travel_date|date:"M d, Y" }}</td>
         <td>{{ b.travelers }}</td>
         <td class="fw-600">{{ b.total_price|money:site.currency_symbol }}</td>

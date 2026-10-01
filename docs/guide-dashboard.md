@@ -1,16 +1,19 @@
 # Guide dashboard (`/guide/`)
 
-For users with the **Tour guide** role. A guide only ever sees tours assigned to them and bookings
-on those tours - every query is scoped by `tour__guide=request.user`, and other records return 404.
+For users with the **Tour guide** role. A guide only sees bookings assigned to them
+(`Booking.guide`) - every query is scoped to `request.user`, and other records return 404.
+See [workflow.md](workflow.md) for how this connects to the website and the admin dashboard.
 
 | Page | What it does |
 |------|--------------|
-| **Overview** | Next departure card (travelers, duration, status, quick links), KPIs (upcoming bookings & travelers, awaiting confirmation, completed trips, rating), travelers-per-month chart, this week's trips, upcoming bookings, latest reviews |
-| **Schedule** | FullCalendar month/list view of all trips, colour-coded by status, each spanning the tour's duration |
-| **Travelers & bookings** | Upcoming / past / all, filter by status. Open a booking to see contact details and special requests, **confirm or complete** it and keep private **guide notes** (visible to admins). Cancellations are reserved for the office |
+| **Overview** | New trip requests with one-click **Accept**, next departure card, KPIs (requests, upcoming trips & travelers, completed trips, rating), travelers-per-month chart, this week's trips and time off, latest reviews |
+| **Schedule** | Calendar of requests (grey), confirmed and completed trips spanning each tour's duration, plus **time off** blocks. Add/remove time off - the website then refuses bookings for your tours on those dates, and you're warned if it overlaps accepted trips |
+| **Trips & requests** | Tabs: Requests / Upcoming / Past / Declined / All. **Accept** (confirms the trip and notifies the traveler) or **Decline** with a reason (the office reassigns it). Overlap and time-off warnings before you accept |
+| **Trip details** | Contact details, special requests, **participant list** (names, ages, nationality, dietary/medical notes), itinerary, **chat with the traveler**, private notes, *Mark completed* after the trip starts |
+| **Messages** | All your trip conversations with unread badges |
 | **My tours** | Assigned tours with upcoming departures, traveler totals and rating |
 | **Tour detail** | Each upcoming departure with seats filled vs. capacity, itinerary, inclusions |
-| **Manifest** | Printable passenger list for one departure (`Print` hides the navigation) |
+| **Manifest** | Printable passenger list for one departure, every named participant included |
 | **Reviews** | Average, star distribution and all reviews of the guide's tours |
 | **My profile** | Name, photo, bio, languages, experience, availability - shown to travelers on tour pages |
 

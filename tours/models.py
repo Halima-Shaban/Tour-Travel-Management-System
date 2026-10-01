@@ -187,6 +187,11 @@ class Booking(models.Model):
         PAID = "paid", "Paid"
         REFUNDED = "refunded", "Refunded"
 
+    class GuideResponse(models.TextChoices):
+        PENDING = "pending", "Awaiting guide"
+        ACCEPTED = "accepted", "Accepted by guide"
+        DECLINED = "declined", "Declined by guide"
+
     reference = models.CharField(max_length=12, unique=True, default=generate_reference, editable=False)
     tour = models.ForeignKey(Tour, on_delete=models.PROTECT, related_name="bookings")
     user = models.ForeignKey(
@@ -203,6 +208,23 @@ class Booking(models.Model):
     payment_status = models.CharField(max_length=20, choices=Payment.choices, default=Payment.UNPAID)
     special_requests = models.TextField(blank=True)
     guide_notes = models.TextField(blank=True, help_text="Private notes from the assigned guide.")
+    # Guide assignment (defaults to the tour's guide; admins can reassign per booking)
+    guide = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name="assigned_bookings",
+        limit_choices_to={"profile__role": "guide"},
+    )
+    guide_status = models.CharField(max_length=10, choices=GuideResponse.choices, default=GuideResponse.PENDING)
+    guide_responded_at = models.DateTimeField(null=True, blank=True)
+    guide_decline_reason = models.CharField(max_length=255, blank=True)
+    # Online payment (Stripe)
+    stripe_session_id = models.CharField(max_length=255, blank=True)
+    stripe_payment_intent = models.CharField(max_length=255, blank=True)
+    amount_paid = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal("0"))
+    paid_at = models.DateTimeField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -216,8 +238,44 @@ class Booking(models.Model):
     def save(self, *args, **kwargs):
         if not self.unit_price:
             self.unit_price = self.tour.current_price
+        if self._state.adding and self.guide_id is None:
+            self.guide = self.tour.guide
         self.total_price = self.unit_price * self.travelers
         super().save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return reverse("accounts:booking_detail", args=[self.reference])
+
+    @property
+    def is_upcoming(self):
+        return self.travel_date >= timezone.localdate()
+
+    @property
+    def has_started(self):
+        return self.travel_date <= timezone.localdate()
+
+    @property
+    def needs_guide(self):
+        return self.status != self.Status.CANCELLED and (
+            self.guide_id is None or self.guide_status == self.GuideResponse.DECLINED
+        )
+
+    @property
+    def can_pay(self):
+        return self.payment_status == self.Payment.UNPAID and self.status in (
+            self.Status.PENDING, self.Status.CONFIRMED
+        )
+
+    @property
+    def can_guide_respond(self):
+        return (
+            self.guide_status == self.GuideResponse.PENDING
+            and self.status in (self.Status.PENDING, self.Status.CONFIRMED)
+            and self.is_upcoming
+        )
+
+    def overlaps(self, start, end):
+        return self.travel_date <= end and self.end_date >= start
 
     @property
     def end_date(self):
@@ -242,3 +300,40 @@ class Review(models.Model):
 
     def __str__(self):
         return f"{self.rating}* {self.tour} by {self.user}"
+
+
+class Participant(models.Model):
+    """A named traveler on a booking (the lead traveler fills these in; guides see them in manifests)."""
+
+    booking = models.ForeignKey(Booking, on_delete=models.CASCADE, related_name="participants")
+    full_name = models.CharField(max_length=120)
+    age = models.PositiveSmallIntegerField(null=True, blank=True, validators=[MaxValueValidator(120)])
+    nationality = models.CharField(max_length=60, blank=True)
+    notes = models.CharField(max_length=255, blank=True, help_text="Dietary needs, mobility, allergies...")
+
+    class Meta:
+        ordering = ["id"]
+
+    def __str__(self):
+        return self.full_name
+
+
+class GuideUnavailability(models.Model):
+    """Time off blocked by a guide; bookings can't be made on these dates for the guide's tours."""
+
+    guide = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="unavailability")
+    start_date = models.DateField()
+    end_date = models.DateField()
+    reason = models.CharField(max_length=120, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ["start_date"]
+        verbose_name_plural = "guide unavailability"
+
+    def __str__(self):
+        return f"{self.guide} off {self.start_date} - {self.end_date}"
+
+    @classmethod
+    def overlapping(cls, guide, start, end):
+        return cls.objects.filter(guide=guide, start_date__lte=end, end_date__gte=start)

@@ -35,6 +35,7 @@ The seeder is idempotent (safe to re-run). `--flush` wipes tours/bookings/posts 
 python manage.py test tests
 ```
 
-The suite (29 tests) covers public pages, booking rules (sale price, capacity, past dates), role
+The suite (57 tests) covers public pages, booking rules (sale price, capacity, past dates), role
 isolation between admin / guide / customer, dashboard CRUD, customization and the chatbot
-(Groq call mocked, offline fallback, rate limiting).
+(Groq call mocked, offline fallback, rate limiting), the guide accept/decline workflow, time off,
+participants, messaging permissions, notifications and Stripe checkout/webhook/refunds (mocked).

@@ -1,24 +1,29 @@
 {% extends "guide/_base.html" %}
 {% load ui %}
-{% block title %}Bookings{% endblock %}
-{% block page_title %}Travelers & bookings{% endblock %}
+{% block title %}Trips & requests{% endblock %}
+{% block page_title %}Trips & requests{% endblock %}
 {% block content %}
-<div class="d-flex flex-wrap gap-2 justify-content-between mb-3">
-  <div class="chip-tabs">
-    <a class="{% if when == 'upcoming' %}active{% endif %}" href="{% query when='upcoming' %}">Upcoming</a>
-    <a class="{% if when == 'past' %}active{% endif %}" href="{% query when='past' %}">Past</a>
-    <a class="{% if when == 'all' %}active{% endif %}" href="{% query when='all' %}">All</a>
-  </div>
-  <form class="filters" data-autosubmit><input type="hidden" name="when" value="{{ when }}">
-    <select class="form-select" name="status"><option value="">Any status</option>{% for v, l in statuses %}<option value="{{ v }}" {% if request.GET.status == v %}selected{% endif %}>{{ l }}</option>{% endfor %}</select>
-  </form>
+<div class="chip-tabs mb-3">
+  <a class="{% if tab == 'requests' %}active{% endif %}" href="?tab=requests">Requests<span class="n">{{ counts.requests }}</span></a>
+  <a class="{% if tab == 'upcoming' %}active{% endif %}" href="?tab=upcoming">Upcoming<span class="n">{{ counts.upcoming }}</span></a>
+  <a class="{% if tab == 'past' %}active{% endif %}" href="?tab=past">Past</a>
+  <a class="{% if tab == 'declined' %}active{% endif %}" href="?tab=declined">Declined</a>
+  <a class="{% if tab == 'all' %}active{% endif %}" href="?tab=all">All</a>
 </div>
+{% if tab == 'requests' %}
+<div class="panel">
+  {% for b in bookings %}{% include "guide/_request_row.html" with next="list" %}
+  {% empty %}<div class="panel-body text-center text-muted-2 py-5"><i class="bi bi-inbox fs-1 d-block mb-2"></i>No pending requests - you're all caught up.</div>{% endfor %}
+</div>
+{% else %}
 <div class="panel"><div class="table-responsive"><table class="table table-dash">
-  <thead><tr><th>Travel date</th><th>Tour</th><th>Lead traveler</th><th>Pax</th><th>Status</th><th>Payment</th><th></th></tr></thead>
+  <thead><tr><th>Travel date</th><th>Tour</th><th>Lead traveler</th><th>Pax</th><th>Your response</th><th>Status</th><th>Payment</th><th></th></tr></thead>
   <tbody>{% for b in bookings %}
     <tr><td class="text-nowrap fw-600">{{ b.travel_date|date:"D, M d Y" }}</td><td>{{ b.tour.title|truncatechars:34 }}</td><td><div class="title">{{ b.full_name }}</div><div class="sub">{{ b.phone }}</div></td><td>{{ b.travelers }}</td>
+      <td><span class="badge {% if b.guide_status == 'accepted' %}badge-soft-success{% elif b.guide_status == 'declined' %}badge-soft-danger{% else %}badge-soft-warning{% endif %}">{{ b.get_guide_status_display }}</span></td>
       <td><span class="badge badge-soft-{{ b.status|status_color }}">{{ b.get_status_display }}</span></td><td><span class="badge badge-soft-{{ b.payment_status|status_color }}">{{ b.get_payment_status_display }}</span></td>
-      <td class="text-end"><a class="btn btn-sm btn-soft" href="{% url 'guide:booking_detail' b.pk %}">Manage</a></td></tr>
-  {% empty %}<tr><td colspan="7" class="text-center text-muted-2 py-5">No bookings here.</td></tr>{% endfor %}</tbody>
+      <td class="text-end"><a class="btn btn-sm btn-soft" href="{% url 'guide:booking_detail' b.pk %}">Open</a></td></tr>
+  {% empty %}<tr><td colspan="8" class="text-center text-muted-2 py-5">Nothing here.</td></tr>{% endfor %}</tbody>
 </table></div></div>
+{% endif %}
 {% endblock %}

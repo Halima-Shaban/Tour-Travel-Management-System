@@ -3,22 +3,42 @@
 {% block title %}Schedule{% endblock %}
 {% block page_title %}My schedule{% endblock %}
 {% block content %}
-<div class="panel"><div class="panel-body">
-  <div class="d-flex gap-3 flex-wrap small mb-3"><span><i class="bi bi-circle-fill" style="color:#f59e0b"></i> Pending</span><span><i class="bi bi-circle-fill" style="color:#0f766e"></i> Confirmed</span><span><i class="bi bi-circle-fill" style="color:#16a34a"></i> Completed</span></div>
-  <div id="calendar"></div>
-</div></div>
+<div class="row g-3">
+  <div class="col-xl-8">
+    <div class="panel"><div class="panel-body">
+      <div class="d-flex gap-3 flex-wrap small mb-3"><span><i class="bi bi-circle-fill" style="color:#94a3b8"></i> Request (awaiting you)</span><span><i class="bi bi-circle-fill" style="color:#0f766e"></i> Confirmed</span><span><i class="bi bi-circle-fill" style="color:#16a34a"></i> Completed</span><span><i class="bi bi-square-fill" style="color:#fca5a5"></i> Time off</span></div>
+      <div id="calendar"></div>
+    </div></div>
+  </div>
+  <div class="col-xl-4 d-flex flex-column gap-3">
+    <form method="post" class="panel" novalidate>{% csrf_token %}
+      <div class="panel-head"><div><h2><i class="bi bi-calendar-x text-brand me-1"></i> Block time off</h2><div class="sub">Travelers can't book your tours on these dates.</div></div></div>
+      <div class="panel-body">
+        {% include "partials/_form_errors.html" %}
+        <div class="row g-2"><div class="col-6">{% include "partials/_field.html" with field=form.start_date %}</div><div class="col-6">{% include "partials/_field.html" with field=form.end_date %}</div></div>
+        {% include "partials/_field.html" with field=form.reason %}
+        <button class="btn btn-primary w-100">Save time off</button>
+      </div>
+    </form>
+    <div class="panel"><div class="panel-head"><h2>Upcoming time off</h2></div>
+      {% for b in blocks %}
+      <div class="list-row"><div class="grow"><div class="title">{{ b.start_date|date:"M d" }} → {{ b.end_date|date:"M d, Y" }}</div><div class="sub">{{ b.reason|default:"Unavailable" }}</div></div>
+        <form method="post" action="{% url 'guide:delete_time_off' b.pk %}">{% csrf_token %}<button class="btn btn-sm btn-light text-danger" title="Remove"><i class="bi bi-trash"></i></button></form></div>
+      {% empty %}<div class="panel-body small text-muted-2">No time off scheduled.</div>{% endfor %}
+    </div>
+  </div>
+</div>
 {% endblock %}
 {% block extra_js %}
 <script src="{% static 'vendor/fullcalendar/index.global.min.js' %}"></script>
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-  const cal = new FullCalendar.Calendar(document.getElementById("calendar"), {
+  new FullCalendar.Calendar(document.getElementById("calendar"), {
     initialView: window.innerWidth < 768 ? "listMonth" : "dayGridMonth",
     headerToolbar: { left: "prev,next today", center: "title", right: "dayGridMonth,listMonth" },
     events: "{% url 'guide:calendar_events' %}",
     height: "auto", dayMaxEvents: 3,
-  });
-  cal.render();
+  }).render();
 });
 </script>
 {% endblock %}

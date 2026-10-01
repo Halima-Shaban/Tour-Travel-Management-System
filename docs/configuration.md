@@ -13,6 +13,9 @@ automatically). **Never commit `.env`** - it is git-ignored.
 | `GROQ_MODEL` | `llama-3.3-70b-versatile` | Primary model |
 | `GROQ_FALLBACK_MODEL` | `llama-3.1-8b-instant` | Tried automatically if the primary fails |
 | `CHATBOT_MAX_MESSAGES_PER_HOUR` | `40` | Per-visitor rate limit |
+| `STRIPE_SECRET_KEY` / `STRIPE_PUBLISHABLE_KEY` | - | Enables online payment (see [payments.md](payments.md)) |
+| `STRIPE_WEBHOOK_SECRET` | - | Verifies `/payments/webhook/` calls |
+| `STRIPE_CURRENCY` | `usd` | ISO currency code charged by Stripe |
 | `EMAIL_BACKEND` | console | Use `django.core.mail.backends.smtp.EmailBackend` for real mail |
 | `EMAIL_HOST` / `EMAIL_PORT` / `EMAIL_HOST_USER` / `EMAIL_HOST_PASSWORD` / `EMAIL_USE_TLS` | - | SMTP settings |
 | `DEFAULT_FROM_EMAIL` | `noreply@example.com` | Sender address |

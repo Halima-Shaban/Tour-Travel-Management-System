@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% load ui %}
+{% block title %}Booking {{ booking.reference }}{% endblock %}
+{% block content %}
+{% url 'accounts:bookings' as bookings_url %}
+{% include "partials/_page_hero.html" with title=booking.tour.title subtitle=booking.reference hero_image=booking.tour.cover crumb_url=bookings_url crumb_label="My bookings" %}
+<section class="section">
+  <div class="container">
+    <div class="mb-4">{% include "accounts/_booking_steps.html" %}</div>
+    {% if booking.guide_status == 'declined' and booking.status != 'cancelled' %}<div class="alert alert-warning"><i class="bi bi-arrow-repeat me-1"></i> We're assigning a new guide for your trip - nothing for you to do.</div>{% endif %}
+    <div class="row g-4">
+      <div class="col-lg-7">
+        <div class="card p-4 mb-4" id="travelers">
+          <div class="d-flex justify-content-between align-items-center mb-1"><h2 class="h5 mb-0">Travelers</h2><span class="small text-muted-2">{{ booking.participants.count }} / {{ booking.travelers }} named</span></div>
+          <p class="small text-muted-2">Add everyone's name so your guide can prepare tickets and the passenger list.</p>
+          {% if editable %}
+          <form method="post" novalidate>{% csrf_token %}
+            {{ formset.management_form }}
+            {% for e in formset.non_form_errors %}<div class="alert alert-danger py-2">{{ e }}</div>{% endfor %}
+            <div id="participant-rows">
+              {% for form in formset %}
+              <div class="participant-row row g-2 align-items-start mb-2">
+                {{ form.id }}
+                <div class="col-md-4">{{ form.full_name }}{{ form.full_name.errors }}</div>
+                <div class="col-3 col-md-2">{{ form.age }}</div>
+                <div class="col-4 col-md-3">{{ form.nationality }}</div>
+                <div class="col-5 col-md-3">{{ form.notes }}<label class="small text-danger mt-1 d-inline-flex gap-1 align-items-center" style="cursor:pointer">{{ form.DELETE }} Remove</label></div>
+              </div>
+              {% endfor %}
+            </div>
+            <template id="participant-template">
+              <div class="participant-row row g-2 align-items-start mb-2">
+                {{ formset.empty_form.id }}
+                <div class="col-md-4">{{ formset.empty_form.full_name }}</div>
+                <div class="col-3 col-md-2">{{ formset.empty_form.age }}</div>
+                <div class="col-4 col-md-3">{{ formset.empty_form.nationality }}</div>
+                <div class="col-5 col-md-3">{{ formset.empty_form.notes }}</div>
+              </div>
+            </template>
+            <div class="d-flex gap-2 mt-3">
+              <button type="button" class="btn btn-soft btn-sm" id="add-participant" data-max="{{ booking.travelers }}"><i class="bi bi-person-plus"></i> Add traveler</button>
+              <button class="btn btn-primary btn-sm ms-auto">Save travelers</button>
+            </div>
+          </form>
+          {% else %}
+          <ul class="list-unstyled mb-0">{% for p in booking.participants.all %}<li class="py-1"><i class="bi bi-person me-1"></i>{{ p.full_name }}{% if p.age %}, {{ p.age }}{% endif %}{% if p.nationality %} · {{ p.nationality }}{% endif %}</li>{% empty %}<li class="text-muted-2 small">No names added.</li>{% endfor %}</ul>
+          {% endif %}
+        </div>
+        {% if booking.guide %}
+          {% include "messaging/_thread.html" with chat_title="Chat with your guide" chat_subtitle=booking.guide.get_full_name %}
+        {% else %}
+          {% include "messaging/_thread.html" with chat_title="Chat with our team" chat_subtitle="We'll reply here - your guide will join once assigned." %}
+        {% endif %}
+      </div>
+      <div class="col-lg-5">
+        <div class="booking-card" style="top:90px">
+          <div class="head d-flex justify-content-between"><div><div class="small text-muted-2">Total</div><div class="price fs-3">{{ booking.total_price|money:site.currency_symbol }}</div></div>
+            <div class="text-end"><span class="badge badge-soft-{{ booking.status|status_color }}">{{ booking.get_status_display }}</span><br><span class="badge badge-soft-{{ booking.payment_status|status_color }} mt-1">{{ booking.get_payment_status_display }}</span></div></div>
+          <div class="body">
+            <div class="d-flex justify-content-between small mb-2"><span class="text-muted-2">Dates</span><strong>{{ booking.travel_date|date:"D, M d Y" }}{% if booking.tour.duration_days > 1 %} → {{ booking.end_date|date:"M d" }}{% endif %}</strong></div>
+            <div class="d-flex justify-content-between small mb-2"><span class="text-muted-2">Travelers</span><strong>{{ booking.travelers }} × {{ booking.unit_price|money:site.currency_symbol }}</strong></div>
+            <div class="d-flex justify-content-between small mb-3"><span class="text-muted-2">Destination</span><strong>{{ booking.tour.destination }}</strong></div>
+            {% if booking.guide and booking.guide_status != 'declined' %}
+            <div class="guide-card mb-3"><span class="avatar">{% if booking.guide.profile.avatar %}<img src="{{ booking.guide.profile.avatar.url }}" alt="">{% else %}{{ booking.guide|initials }}{% endif %}</span>
+              <div><div class="fw-600">{{ booking.guide.get_full_name }}</div><div class="small text-muted-2">Your guide · {% if booking.guide_status == 'accepted' %}<span class="text-brand">confirmed</span>{% else %}awaiting confirmation{% endif %}</div></div></div>
+            {% endif %}
+            {% if booking.payment_status == 'paid' %}<div class="alert alert-success py-2 small mb-3"><i class="bi bi-check-circle"></i> Paid {{ booking.amount_paid|money:site.currency_symbol }}{% if booking.paid_at %} on {{ booking.paid_at|date:"M d, Y" }}{% endif %}</div>{% endif %}
+            {% include "accounts/_pay_button.html" with pay_btn_class="w-100 btn-lg" pay_class="mb-2" %}
+            {% if not stripe_enabled and booking.can_pay %}<p class="small text-muted-2 mb-2"><i class="bi bi-info-circle"></i> Payment is collected by our team after confirmation.</p>{% endif %}
+            <a class="btn btn-outline-primary w-100 mb-2" href="{{ booking.tour.get_absolute_url }}">View tour</a>
+            {% if booking.can_cancel %}<form method="post" action="{% url 'accounts:cancel_booking' booking.reference %}" onsubmit="return confirm('Cancel this booking?')">{% csrf_token %}<button class="btn btn-link text-danger w-100 small">Cancel booking</button></form>{% endif %}
+            <p class="small text-muted-2 mb-0 mt-2">{{ site.cancellation_policy }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}
+{% block extra_js %}
+<script>
+(() => {
+  const btn = document.getElementById("add-participant");
+  if (!btn) return;
+  const rows = document.getElementById("participant-rows");
+  const total = document.getElementById("id_p-TOTAL_FORMS");
+  const tpl = document.getElementById("participant-template").innerHTML;
+  const max = parseInt(btn.dataset.max, 10);
+  const sync = () => { btn.disabled = rows.querySelectorAll(".participant-row").length >= max; };
+  btn.addEventListener("click", () => {
+    const i = parseInt(total.value, 10);
+    rows.insertAdjacentHTML("beforeend", tpl.replace(/__prefix__/g, i));
+    total.value = i + 1;
+    rows.lastElementChild.querySelector("input")?.focus();
+    sync();
+  });
+  sync();
+})();
+</script>
+{% endblock %}

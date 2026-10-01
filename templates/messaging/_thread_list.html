@@ -1,0 +1,16 @@
+{% load ui %}
+<div class="card overflow-hidden">
+  {% for t in threads %}
+  <a class="notif-item {% if t.unread %}unread{% endif %}" href="{% if link == 'guide' %}{% url 'guide:booking_detail' t.booking.pk %}{% elif link == 'admin' %}{% url 'dashboard:booking_edit' t.booking.pk %}{% else %}{{ t.booking.get_absolute_url }}{% endif %}#chat">
+    <img src="{{ t.booking.tour.cover }}" alt="" width="48" height="48" class="rounded object-fit-cover flex-shrink-0">
+    <span class="flex-grow-1 min-w-0">
+      <span class="d-flex justify-content-between gap-2"><span class="fw-600 text-truncate">{{ t.booking.tour.title }}</span><span class="small text-muted-2 text-nowrap">{{ t.last.created_at|timesince }} ago</span></span>
+      <span class="d-block small text-muted-2">{{ t.booking.reference }} · {{ t.booking.full_name }}{% if t.booking.guide %} · guide {{ t.booking.guide.get_full_name }}{% endif %}</span>
+      <span class="d-block small text-truncate">{% if t.last.sender == user %}You: {% else %}{{ t.last.sender.first_name|default:t.last.sender.username }}: {% endif %}{{ t.last.body }}</span>
+    </span>
+    {% if t.unread %}<span class="badge bg-brand align-self-center">{{ t.unread }}</span>{% endif %}
+  </a>
+  {% empty %}
+  <div class="text-center text-muted-2 py-5"><i class="bi bi-chat-square-dots fs-1 d-block mb-2"></i>No conversations yet.{% if link != 'admin' %} Open a booking to start chatting.{% endif %}</div>
+  {% endfor %}
+</div>

@@ -1,0 +1,13 @@
+{% load ui %}
+<div class="list-row flex-wrap">
+  <div class="date-tile"><div class="d">{{ b.travel_date|date:"d" }}</div><div class="m">{{ b.travel_date|date:"M" }}</div></div>
+  <div class="grow">
+    <a class="title d-block text-body" href="{% url 'guide:booking_detail' b.pk %}">{{ b.tour.title }}</a>
+    <div class="sub">{{ b.full_name }} · {{ b.travelers }} pax · {{ b.tour.duration_days }} day{{ b.tour.duration_days|pluralize }} · <span class="badge badge-soft-{{ b.payment_status|status_color }}">{{ b.get_payment_status_display }}</span></div>
+  </div>
+  <form method="post" action="{% url 'guide:respond' b.pk %}" class="d-flex gap-2">{% csrf_token %}
+    <input type="hidden" name="next" value="{{ next|default:'detail' }}">
+    <button class="btn btn-sm btn-primary" name="action" value="accept"><i class="bi bi-check-lg"></i> Accept</button>
+    <a class="btn btn-sm btn-light" href="{% url 'guide:booking_detail' b.pk %}#respond">Decline…</a>
+  </form>
+</div>

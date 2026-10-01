@@ -1,0 +1,17 @@
+{% load static %}
+<div class="chat-box" id="chat" data-poll-url="{% url 'messaging:poll' booking.reference %}" data-send-url="{% url 'messaging:send' booking.reference %}" data-csrf="{{ csrf_token }}">
+  <div class="chat-box-head">
+    <i class="bi bi-chat-dots text-brand"></i>
+    <div class="flex-grow-1"><div class="fw-600 small">{{ chat_title|default:"Trip chat" }}</div><div class="text-muted-2" style="font-size:.75rem">{{ chat_subtitle|default:"Traveler, guide and our office can read this conversation." }}</div></div>
+  </div>
+  <div class="chat-box-body" aria-live="polite"><div class="chat-empty text-center text-muted-2 small py-4"><i class="bi bi-chat-square-text fs-3 d-block mb-1"></i>No messages yet - say hello!</div></div>
+  {% if chat_disabled %}
+  <div class="small text-muted-2 p-3 border-top">{{ chat_disabled }}</div>
+  {% else %}
+  <form class="chat-box-form">
+    <textarea rows="1" maxlength="2000" placeholder="Write a message..." aria-label="Message" required></textarea>
+    <button class="btn btn-primary" aria-label="Send"><i class="bi bi-send-fill"></i></button>
+  </form>
+  {% endif %}
+</div>
+<script src="{% static 'js/thread.js' %}" defer></script>

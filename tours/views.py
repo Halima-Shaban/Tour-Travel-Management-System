@@ -8,6 +8,7 @@ from django.urls import reverse
 from core.models import SiteSettings
 from core.utils import notify_staff
 
+from . import services
 from .forms import BookingForm, ReviewForm, TourFilterForm
 from .models import Booking, Destination, Review, Tour
 
@@ -73,6 +74,7 @@ def tour_detail(request, slug):
             if request.user.is_authenticated:
                 booking.user = request.user
             booking.save()
+            services.on_booking_created(booking)
             notify_staff(
                 f"New booking {booking.reference}",
                 f"{booking.full_name} booked {tour} for {booking.travel_date} ({booking.travelers} travelers).",

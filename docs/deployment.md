@@ -10,4 +10,6 @@
 6. Put the site behind HTTPS (secure cookies are enabled automatically when `DEBUG=False`).
 7. For multiple processes, configure a shared cache (Redis/Memcached) so the chatbot rate limit and
    settings cache are shared between workers.
-8. Consider PostgreSQL for production traffic (`DATABASES` in `config/settings.py`).
+8. Stripe: switch to live keys and register the webhook `https://your-domain/payments/webhook/`
+   (see [payments.md](payments.md)).
+9. Consider PostgreSQL for production traffic (`DATABASES` in `config/settings.py`).

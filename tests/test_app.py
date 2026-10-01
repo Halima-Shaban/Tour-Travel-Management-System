@@ -205,14 +205,10 @@ class GuideDashboardTests(BaseTestCase):
         self.assertEqual(self.client.get(reverse("guide:booking_detail", args=[self.theirs.pk])).status_code, 404)
         self.assertEqual(self.client.get(reverse("guide:tour_detail", args=[self.other_tour.slug])).status_code, 404)
 
-    def test_guide_confirms_booking_but_cannot_cancel(self):
-        url = reverse("guide:booking_detail", args=[self.mine.pk])
-        self.client.post(url, {"status": "confirmed", "guide_notes": "Pickup 7am"})
+    def test_guide_saves_private_notes(self):
+        self.client.post(reverse("guide:booking_detail", args=[self.mine.pk]), {"save_notes": "1", "guide_notes": "Pickup 7am"})
         self.mine.refresh_from_db()
-        self.assertEqual((self.mine.status, self.mine.guide_notes), ("confirmed", "Pickup 7am"))
-        self.client.post(url, {"status": "cancelled"})
-        self.mine.refresh_from_db()
-        self.assertEqual(self.mine.status, "confirmed")
+        self.assertEqual(self.mine.guide_notes, "Pickup 7am")
 
     def test_calendar_feed(self):
         events = self.client.get(reverse("guide:calendar_events")).json()

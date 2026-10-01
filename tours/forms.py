@@ -4,7 +4,7 @@ from django.utils import timezone
 
 from core.mixins import StyledFormMixin
 
-from .models import Booking, Destination, Review, Tour
+from .models import Booking, Destination, GuideUnavailability, Participant, Review, Tour
 
 
 class BookingForm(StyledFormMixin, forms.ModelForm):
@@ -32,6 +32,10 @@ class BookingForm(StyledFormMixin, forms.ModelForm):
     def clean(self):
         data = super().clean()
         date, travelers = data.get("travel_date"), data.get("travelers")
+        if self.tour and date and self.tour.guide_id:
+            end = date + timezone.timedelta(days=self.tour.duration_days - 1)
+            if GuideUnavailability.overlapping(self.tour.guide, date, end).exists():
+                raise forms.ValidationError("Our guide isn't available on these dates. Please choose another date.")
         if self.tour and date and travelers:
             left = self.tour.seats_left(date)
             if travelers > left:
@@ -117,13 +121,59 @@ class BookingAdminForm(StyledFormMixin, forms.ModelForm):
         }
 
 
-class GuideBookingForm(StyledFormMixin, forms.ModelForm):
+class GuideNotesForm(StyledFormMixin, forms.ModelForm):
     class Meta:
         model = Booking
-        fields = ["status", "guide_notes"]
-        widgets = {"guide_notes": forms.Textarea(attrs={"rows": 3})}
+        fields = ["guide_notes"]
+        widgets = {"guide_notes": forms.Textarea(attrs={"rows": 3, "placeholder": "Pickup time, meeting point, reminders..."})}
+        labels = {"guide_notes": "Private notes (visible to the office)"}
+        help_texts = {"guide_notes": ""}
+
+
+class DeclineForm(forms.Form):
+    reason = forms.CharField(
+        max_length=255, required=False,
+        widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "Reason (optional) - e.g. already booked that week"}),
+    )
+
+
+class ParticipantForm(StyledFormMixin, forms.ModelForm):
+    class Meta:
+        model = Participant
+        fields = ["full_name", "age", "nationality", "notes"]
+        widgets = {
+            "full_name": forms.TextInput(attrs={"placeholder": "Full name"}),
+            "age": forms.NumberInput(attrs={"placeholder": "Age", "min": 0, "max": 120}),
+            "nationality": forms.TextInput(attrs={"placeholder": "Nationality"}),
+            "notes": forms.TextInput(attrs={"placeholder": "Diet, allergies, mobility..."}),
+        }
+
+
+ParticipantFormSet = forms.inlineformset_factory(
+    Booking, Participant, form=ParticipantForm, extra=0, can_delete=True, validate_max=True
+)
+
+
+class UnavailabilityForm(StyledFormMixin, forms.ModelForm):
+    class Meta:
+        model = GuideUnavailability
+        fields = ["start_date", "end_date", "reason"]
+        widgets = {"start_date": forms.DateInput(attrs={"type": "date"}), "end_date": forms.DateInput(attrs={"type": "date"})}
+
+    def clean(self):
+        data = super().clean()
+        start, end = data.get("start_date"), data.get("end_date")
+        if start and end and end < start:
+            self.add_error("end_date", "End date must be on or after the start date.")
+        if start and start < timezone.localdate():
+            self.add_error("start_date", "Choose today or a future date.")
+        return data
+
+
+class AssignGuideForm(forms.Form):
+    guide = forms.ModelChoiceField(User.objects.none(), required=True, widget=forms.Select(attrs={"class": "form-select"}))
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Guides can confirm, complete or leave pending - cancellations go through the office.
-        self.fields["status"].choices = [c for c in Booking.Status.choices if c[0] != Booking.Status.CANCELLED]
+        self.fields["guide"].queryset = User.objects.filter(profile__role="guide", is_active=True).order_by("first_name")
+        self.fields["guide"].label_from_instance = lambda u: (u.get_full_name() or u.username) + ("" if u.profile.is_available else " (unavailable)")

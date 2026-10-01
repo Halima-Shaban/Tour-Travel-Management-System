@@ -14,7 +14,11 @@ Available to users whose role is **Administrator** (and all superusers). Others 
 - Status chips with counts (pending / confirmed / completed / cancelled), search by reference,
   name, email or tour, filter by payment and upcoming/past.
 - Row actions: confirm, mark completed, mark paid, cancel - one click.
-- Full edit page with price breakdown, guide notes and customer account link.
+- **Needs guide** tab: upcoming bookings without a guide or declined by one (also a red alert on the overview).
+- Booking page: edit details · guide panel (response, decline reason, overlap warning, **assign/reassign**)
+  · payment panel (amount, Stripe link, **refund via Stripe**) · participants · the trip **conversation**
+  (reply as the office) · guide notes. Status/payment changes trigger the same notifications as the
+  rest of the system.
 - **Export CSV** respects the active filters.
 
 ## Catalogue
@@ -31,7 +35,9 @@ Available to users whose role is **Administrator** (and all superusers). Others 
 
 ## Engagement
 - **Inbox** for contact-form messages (unread badge in the sidebar), reply by email.
+- **Trip conversations** - every traveler ↔ guide chat; open one to reply as the office.
 - **Chatbot logs** - every conversation, with which engine answered.
+- **Notifications** bell: new bookings, guide accept/decline, payments, cancellations.
 - **Subscribers** with CSV export. **Blog** CRUD.
 
 ## System

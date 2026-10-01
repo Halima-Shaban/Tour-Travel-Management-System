@@ -1,0 +1,6 @@
+{% load ui %}
+{% if stripe_enabled and booking.can_pay %}
+<form method="post" action="{% url 'payments:checkout' booking.reference %}" class="{{ pay_class }}">{% csrf_token %}
+  <button class="btn btn-primary {{ pay_btn_class }}"><i class="bi bi-lock-fill me-1"></i> Pay {{ booking.total_price|money:site.currency_symbol }} securely</button>
+</form>
+{% endif %}

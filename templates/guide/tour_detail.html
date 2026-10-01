@@ -12,7 +12,7 @@
       <div class="list-row">
         <div class="date-tile"><div class="d">{{ d.travel_date|date:"d" }}</div><div class="m">{{ d.travel_date|date:"M" }}</div></div>
         <div class="grow"><div class="title">{{ d.travel_date|date:"l, M d Y" }}</div>
-          <div class="d-flex align-items-center gap-2"><div class="progress progress-thin flex-grow-1" style="max-width:220px"><div class="progress-bar" style="width:{% widthratio d.travelers tour.max_group_size 100 %}%"></div></div><span class="sub">{{ d.travelers }}/{{ tour.max_group_size }} · {{ d.groups }} booking{{ d.groups|pluralize }}</span></div></div>
+          <div class="d-flex align-items-center gap-2"><div class="progress progress-thin flex-grow-1" style="max-width:220px"><div class="progress-bar" style="width:{% widthratio d.travelers tour.max_group_size 100 %}%"></div></div><span class="sub">{{ d.travelers }}/{{ tour.max_group_size }} · {{ d.groups }} booking{{ d.groups|pluralize }}{% if d.pending %} · <span class="text-warning fw-600">{{ d.pending }} awaiting you</span>{% endif %}</span></div></div>
         <a class="btn btn-sm btn-soft" href="{% url 'guide:manifest' tour.slug d.travel_date|date:'Y-m-d' %}"><i class="bi bi-list-check"></i> Manifest</a>
       </div>
       {% empty %}<div class="panel-body text-muted-2">No upcoming departures.</div>{% endfor %}

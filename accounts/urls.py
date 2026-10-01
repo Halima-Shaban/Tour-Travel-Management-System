@@ -11,6 +11,8 @@ urlpatterns = [
     path("logout/", LogoutView.as_view(), name="logout"),
     path("redirect/", views.role_redirect, name="redirect"),
     path("bookings/", views.my_bookings, name="bookings"),
+    path("bookings/<str:reference>/", views.booking_detail, name="booking_detail"),
     path("bookings/<str:reference>/cancel/", views.cancel_booking, name="cancel_booking"),
+    path("messages/", views.inbox, name="inbox"),
     path("profile/", views.profile, name="profile"),
 ]

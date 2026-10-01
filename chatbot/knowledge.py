@@ -1,4 +1,5 @@
 """Builds the business context the assistant is grounded on (tours, destinations, policies)."""
+from django.conf import settings
 from django.core.cache import cache
 from django.urls import reverse
 
@@ -38,6 +39,11 @@ def build_knowledge():
             f"CANCELLATION POLICY: {site.cancellation_policy}",
             "HOW TO BOOK: open a tour page, pick a date and number of travelers, fill in contact details and submit. "
             "A booking reference (GT-XXXXXX) is shown instantly; registered users can track/cancel bookings at /account/bookings/.",
+            "PAYMENT: " + ("travelers can pay securely online by card (Stripe) from the confirmation page or "
+            "their booking page; we never take card details in chat." if settings.STRIPE_SECRET_KEY else
+            "payment is arranged by our team after the guide confirms the trip."),
+            "AFTER BOOKING: the assigned guide accepts the trip, travelers add companions' names and can chat "
+            "with their guide from the booking page (/account/bookings/).",
             "USEFUL PAGES: all tours /tours/, destinations /tours/destinations/, contact /contact/, blog /blog/, sign up /account/signup/.",
             "",
             "DESTINATIONS:",

@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}Messages{% endblock %}
+{% block content %}
+{% include "partials/_page_hero.html" with title="Messages" subtitle="Conversations with your guides and our team." %}
+<section class="section">
+  <div class="container" style="max-width:820px">
+    {% include "messaging/_thread_list.html" %}
+  </div>
+</section>
+{% endblock %}

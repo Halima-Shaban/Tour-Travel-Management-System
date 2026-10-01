@@ -21,6 +21,8 @@ urlpatterns = [
     path("bookings/export/", views.booking_export, name="booking_export"),
     path("bookings/<int:pk>/", views.BookingUpdate.as_view(), name="booking_edit"),
     path("bookings/<int:pk>/status/", views.booking_quick_status, name="booking_status"),
+    path("bookings/<int:pk>/action/", views.booking_action, name="booking_action"),
+    path("conversations/", views.conversation_list, name="conversations"),
     # People
     path("guides/", views.guide_list, name="guides"),
     path("guides/new/", views.GuideCreate.as_view(), name="guide_create"),

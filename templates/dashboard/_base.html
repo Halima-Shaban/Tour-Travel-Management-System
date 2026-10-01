@@ -17,6 +17,7 @@
 <a class="{% active 'dashboard:users' %}" href="{% url 'dashboard:users' %}"><i class="bi bi-people"></i> Users</a>
 <div class="group">Engagement</div>
 <a class="{% active 'dashboard:messages' %}" href="{% url 'dashboard:messages' %}"><i class="bi bi-envelope"></i> Inbox{% if counts.unread %}<span class="count">{{ counts.unread }}</span>{% endif %}</a>
+<a class="{% active 'dashboard:conversations' %}" href="{% url 'dashboard:conversations' %}"><i class="bi bi-chat-dots"></i> Trip conversations</a>
 <a class="{% active 'dashboard:chats' %}" href="{% url 'dashboard:chats' %}"><i class="bi bi-robot"></i> Chatbot logs</a>
 <a class="{% active 'dashboard:subscribers' %}" href="{% url 'dashboard:subscribers' %}"><i class="bi bi-megaphone"></i> Subscribers</a>
 <a class="{% active 'dashboard:posts' %}" href="{% url 'dashboard:posts' %}"><i class="bi bi-journal-richtext"></i> Blog</a>

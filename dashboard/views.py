@@ -21,7 +21,10 @@ from blog.models import Post
 from chatbot.models import Conversation
 from core.forms import SiteSettingsForm
 from core.models import ContactMessage, NewsletterSubscriber, SiteSettings
-from tours.forms import BookingAdminForm, DestinationForm, TourForm
+from messaging.services import threads_for
+from payments import gateway
+from tours import services
+from tours.forms import AssignGuideForm, BookingAdminForm, DestinationForm, TourForm
 from tours.models import Booking, Destination, Review, Tour
 
 from . import analytics
@@ -84,11 +87,18 @@ class HomeView(AdminRequiredMixin, TemplateView):
             destination_chart={"labels": [d.name for d in destinations], "values": [d.n for d in destinations]},
             recent_bookings=Booking.objects.select_related("tour")[:8],
             upcoming=active.filter(travel_date__gte=today, travel_date__lte=today + timedelta(days=14))
-            .select_related("tour", "tour__guide")
+            .select_related("tour", "guide")
             .order_by("travel_date")[:8],
             unassigned=Tour.objects.active().filter(guide__isnull=True).count(),
+            needs_guide=needs_guide_qs().count(),
             **kwargs,
         )
+
+
+def needs_guide_qs():
+    return Booking.objects.exclude(status=Booking.Status.CANCELLED).filter(
+        travel_date__gte=timezone.localdate()
+    ).filter(Q(guide__isnull=True) | Q(guide_status=Booking.GuideResponse.DECLINED))
 
 
 # --------------------------------------------------------------------------- generic CRUD helpers
@@ -189,7 +199,7 @@ class DestinationDelete(CrudDeleteView):
 
 # --------------------------------------------------------------------------- bookings
 def _filtered_bookings(request):
-    bookings = Booking.objects.select_related("tour", "tour__guide", "user")
+    bookings = Booking.objects.select_related("tour", "guide", "user")
     if q := request.GET.get("q"):
         bookings = bookings.filter(
             Q(reference__icontains=q) | Q(full_name__icontains=q) | Q(email__icontains=q) | Q(tour__title__icontains=q)
@@ -198,6 +208,10 @@ def _filtered_bookings(request):
         bookings = bookings.filter(status=status)
     if payment := request.GET.get("payment"):
         bookings = bookings.filter(payment_status=payment)
+    if request.GET.get("guide") == "needs":
+        bookings = bookings.filter(pk__in=needs_guide_qs())
+    elif request.GET.get("guide") in Booking.GuideResponse.values:
+        bookings = bookings.filter(guide_status=request.GET["guide"])
     if when := request.GET.get("when"):
         today = timezone.localdate()
         bookings = bookings.filter(travel_date__gte=today) if when == "upcoming" else bookings.filter(travel_date__lt=today)
@@ -217,6 +231,7 @@ def booking_list(request):
             "payments": Booking.Payment.choices,
             "counts": counts,
             "total": sum(counts.values()),
+            "needs_guide": needs_guide_qs().count(),
         },
     )
 
@@ -229,7 +244,7 @@ def booking_export(request):
     writer.writerow(["Reference", "Tour", "Guide", "Customer", "Email", "Phone", "Travel date", "Travelers",
                      "Total", "Status", "Payment", "Created"])
     for b in _filtered_bookings(request):
-        guide = b.tour.guide.get_full_name() if b.tour.guide else ""
+        guide = b.guide.get_full_name() if b.guide else ""
         writer.writerow([b.reference, b.tour.title, guide, b.full_name, b.email, b.phone, b.travel_date, b.travelers,
                          b.total_price, b.get_status_display(), b.get_payment_status_display(), b.created_at.strftime("%Y-%m-%d")])
     return response
@@ -243,6 +258,61 @@ class BookingUpdate(CrudMixin, UpdateView):
     def get_success_message(self, cleaned_data):
         return self.success_message % {"reference": self.object.reference}
 
+    def get_success_url(self):
+        return reverse("dashboard:booking_edit", args=[self.object.pk])
+
+    def form_valid(self, form):
+        before = Booking.objects.get(pk=self.object.pk)
+        new_status, new_payment = form.cleaned_data["status"], form.cleaned_data["payment_status"]
+        # Transitions with side effects (notifications, Stripe) go through the workflow service.
+        form.instance.status, form.instance.payment_status = before.status, before.payment_status
+        response = super().form_valid(form)
+        booking = self.object
+        if new_status == Booking.Status.CANCELLED and before.status != new_status:
+            services.cancel_booking(booking, by=self.request.user)
+        elif new_status != before.status:
+            Booking.objects.filter(pk=booking.pk).update(status=new_status)
+        if new_payment == Booking.Payment.PAID and before.payment_status != new_payment:
+            services.mark_paid(booking)
+        elif new_payment == Booking.Payment.REFUNDED and before.payment_status != new_payment:
+            services.mark_refunded(booking)
+        elif new_payment != before.payment_status:
+            Booking.objects.filter(pk=booking.pk).update(payment_status=new_payment)
+        return response
+
+    def get_context_data(self, **kwargs):
+        booking = self.object
+        return super().get_context_data(
+            assign_form=AssignGuideForm(initial={"guide": booking.guide_id}),
+            participants=booking.participants.all(),
+            conflicts=services.guide_conflicts(booking),
+            stripe_enabled=gateway.is_enabled(),
+            **kwargs,
+        )
+
+
+@admin_required
+def booking_action(request, pk):
+    """Side-effect actions from the booking page: assign guide, Stripe refund."""
+    booking = get_object_or_404(Booking, pk=pk)
+    if request.method == "POST":
+        action = request.POST.get("action")
+        if action == "assign":
+            form = AssignGuideForm(request.POST)
+            if form.is_valid():
+                guide = form.cleaned_data["guide"]
+                services.assign_guide(booking, guide, by=request.user)
+                messages.success(request, f"{guide.get_full_name()} assigned - waiting for their confirmation.")
+        elif action == "refund" and booking.payment_status == Booking.Payment.PAID and booking.stripe_payment_intent:
+            try:
+                gateway.refund(booking.stripe_payment_intent)
+            except gateway.PaymentError as exc:
+                messages.error(request, f"Stripe refund failed: {exc}")
+            else:
+                services.mark_refunded(booking)
+                messages.success(request, "Refund issued through Stripe.")
+    return redirect("dashboard:booking_edit", pk=pk)
+
 
 @admin_required
 def booking_quick_status(request, pk):
@@ -250,11 +320,13 @@ def booking_quick_status(request, pk):
     if request.method == "POST":
         status = request.POST.get("status")
         payment = request.POST.get("payment_status")
-        if status in Booking.Status.values:
+        if status == Booking.Status.CANCELLED:
+            services.cancel_booking(booking, by=request.user)
+        elif status in Booking.Status.values:
             booking.status = status
-        if payment in Booking.Payment.values:
-            booking.payment_status = payment
-        booking.save()
+            booking.save(update_fields=["status", "updated_at"])
+        if payment == Booking.Payment.PAID:
+            services.mark_paid(booking)
         messages.success(request, f"Booking {booking.reference} updated.")
     return redirect(request.META.get("HTTP_REFERER") or "dashboard:bookings")
 
@@ -267,7 +339,9 @@ def guide_list(request):
         .select_related("profile")
         .annotate(
             n_tours=Count("guided_tours", distinct=True),
-            n_bookings=Count("guided_tours__bookings", filter=~Q(guided_tours__bookings__status="cancelled"), distinct=True),
+            n_bookings=Count("assigned_bookings", filter=~Q(assigned_bookings__status="cancelled"), distinct=True),
+            n_pending=Count("assigned_bookings", filter=Q(assigned_bookings__guide_status="pending")
+                            & ~Q(assigned_bookings__status="cancelled"), distinct=True),
             rating=Avg("guided_tours__reviews__rating"),
         )
         .order_by("first_name")
@@ -393,6 +467,12 @@ class PostUpdate(CrudMixin, UpdateView):
 
 class PostDelete(CrudDeleteView):
     model, list_url = Post, "dashboard:posts"
+
+
+# --------------------------------------------------------------------------- traveler <-> guide conversations
+@admin_required
+def conversation_list(request):
+    return render(request, "dashboard/conversations.html", {"threads": threads_for(request.user)})
 
 
 # --------------------------------------------------------------------------- chatbot logs

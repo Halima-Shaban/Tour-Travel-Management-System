@@ -1,0 +1,9 @@
+<div class="step-track">
+  <div class="step done"><i class="bi bi-check-circle"></i> Requested</div>
+  <div class="step {% if booking.guide_status == 'accepted' %}done{% elif booking.guide_status == 'declined' %}{% endif %}">
+    <i class="bi bi-person-check"></i> {% if booking.guide_status == 'accepted' %}Guide confirmed{% else %}Awaiting guide{% endif %}</div>
+  <div class="step {% if booking.payment_status == 'paid' %}done{% elif booking.payment_status == 'refunded' %}bad{% endif %}">
+    <i class="bi bi-credit-card"></i> {{ booking.get_payment_status_display }}</div>
+  <div class="step {% if booking.status == 'completed' %}done{% elif booking.status == 'cancelled' %}bad{% endif %}">
+    <i class="bi bi-flag"></i> {% if booking.status == 'cancelled' %}Cancelled{% elif booking.status == 'completed' %}Completed{% else %}Trip day{% endif %}</div>
+</div>

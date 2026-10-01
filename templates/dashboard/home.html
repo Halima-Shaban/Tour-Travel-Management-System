@@ -14,8 +14,9 @@
   <div class="col-sm-6 col-xl-3"><div class="kpi"><span class="icon-circle tone-violet"><i class="bi bi-star-fill"></i></span><div><div class="label">Avg. rating</div><div class="value">{{ kpis.rating }}<small class="fs-6 text-muted-2">/5</small></div><div class="small text-muted-2">{{ kpis.customers }} customers · {{ kpis.guides }} guides</div></div></div></div>
 </div>
 
-{% if unassigned or kpis.unread %}
+{% if unassigned or kpis.unread or needs_guide %}
 <div class="d-flex flex-column gap-2 mb-4">
+  {% if needs_guide %}<div class="alert alert-danger d-flex align-items-center mb-0 py-2"><i class="bi bi-person-x me-2"></i>{{ needs_guide }} upcoming booking{{ needs_guide|pluralize }} declined by a guide or without a guide.<a class="ms-auto fw-600" href="{% url 'dashboard:bookings' %}?guide=needs">Reassign now</a></div>{% endif %}
   {% if unassigned %}<div class="alert alert-warning d-flex align-items-center mb-0 py-2"><i class="bi bi-exclamation-triangle me-2"></i>{{ unassigned }} active tour{{ unassigned|pluralize }} without a guide.<a class="ms-auto fw-600" href="{% url 'dashboard:tours' %}">Assign guides</a></div>{% endif %}
   {% if kpis.unread %}<div class="alert alert-info d-flex align-items-center mb-0 py-2"><i class="bi bi-envelope me-2"></i>{{ kpis.unread }} unread message{{ kpis.unread|pluralize }} in your inbox.<a class="ms-auto fw-600" href="{% url 'dashboard:messages' %}?unread=1">Open inbox</a></div>{% endif %}
 </div>
@@ -38,7 +39,7 @@
   <div class="col-xl-4 col-md-6"><div class="panel h-100"><div class="panel-head"><h2>Departures · next 14 days</h2></div>
     {% for b in upcoming %}
     <a class="list-row text-body" href="{% url 'dashboard:booking_edit' b.pk %}"><div class="date-tile"><div class="d">{{ b.travel_date|date:"d" }}</div><div class="m">{{ b.travel_date|date:"M" }}</div></div>
-      <div class="grow"><div class="title">{{ b.tour.title }}</div><div class="sub">{{ b.full_name }} · {{ b.travelers }} pax · {% if b.tour.guide %}{{ b.tour.guide.get_full_name }}{% else %}<span class="text-danger">No guide</span>{% endif %}</div></div>
+      <div class="grow"><div class="title">{{ b.tour.title }}</div><div class="sub">{{ b.full_name }} · {{ b.travelers }} pax · {% if b.guide %}{{ b.guide.get_full_name }}{% else %}<span class="text-danger">No guide</span>{% endif %}</div></div>
       <span class="badge badge-soft-{{ b.status|status_color }}">{{ b.get_status_display }}</span></a>
     {% empty %}<div class="panel-body text-muted-2">No departures in the next two weeks.</div>{% endfor %}
   </div></div>

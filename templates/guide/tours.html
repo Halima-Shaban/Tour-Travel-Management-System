@@ -9,7 +9,7 @@
       <img src="{{ t.cover }}" class="w-100" style="aspect-ratio:16/9;object-fit:cover" alt="">
       <div class="panel-body d-flex flex-column flex-grow-1">
         <div class="d-flex justify-content-between align-items-start gap-2"><h3 class="h6 mb-1">{{ t.title }}</h3>{% if not t.is_active %}<span class="badge badge-soft-secondary">Hidden</span>{% endif %}</div>
-        <div class="small text-muted-2 mb-3">{{ t.destination }} · {{ t.duration_days }} days · max {{ t.max_group_size }}</div>
+        <div class="small text-muted-2 mb-3">{{ t.destination }} · {{ t.duration_days }} day{{ t.duration_days|pluralize }} · max {{ t.max_group_size }}</div>
         <div class="row text-center g-2 mb-3">
           <div class="col-4"><div class="bg-surface-2 rounded p-2"><div class="fw-bold">{{ t.n_upcoming }}</div><div class="small text-muted-2">Upcoming</div></div></div>
           <div class="col-4"><div class="bg-surface-2 rounded p-2"><div class="fw-bold">{{ t.n_travelers|default:0 }}</div><div class="small text-muted-2">Travelers</div></div></div>

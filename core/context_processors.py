@@ -7,4 +7,5 @@ def site(request):
     return {
         "site": SiteSettings.load(),
         "GOOGLE_MAPS_API_KEY": settings.GOOGLE_MAPS_API_KEY,
+        "stripe_enabled": bool(settings.STRIPE_SECRET_KEY),
     }

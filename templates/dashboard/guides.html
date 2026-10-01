@@ -18,6 +18,7 @@
         <div class="col-4"><div class="bg-surface-2 rounded p-2"><div class="fw-bold fs-5">{{ g.n_bookings }}</div><div class="small text-muted-2">Bookings</div></div></div>
         <div class="col-4"><div class="bg-surface-2 rounded p-2"><div class="fw-bold fs-5">{{ g.rating|floatformat:1|default:"-" }}</div><div class="small text-muted-2">Rating</div></div></div>
       </div>
+      {% if g.n_pending %}<div class="small text-warning fw-600 mb-2"><i class="bi bi-hourglass-split"></i> {{ g.n_pending }} request{{ g.n_pending|pluralize }} awaiting response</div>{% endif %}
       <div class="small text-muted-2 mb-3"><i class="bi bi-translate me-1"></i>{{ g.profile.languages|default:"Languages not set" }} · <i class="bi bi-award me-1"></i>{{ g.profile.years_experience }} yrs</div>
       <div class="d-flex gap-2"><a class="btn btn-sm btn-soft" href="{% url 'dashboard:user_edit' g.pk %}"><i class="bi bi-pencil"></i> Edit</a><a class="btn btn-sm btn-light" href="{% url 'dashboard:tours' %}">Assign tours</a>{% if g.profile.phone %}<a class="btn btn-sm btn-light ms-auto" href="tel:{{ g.profile.phone|cut:' ' }}"><i class="bi bi-telephone"></i></a>{% endif %}</div>
     </div></div>

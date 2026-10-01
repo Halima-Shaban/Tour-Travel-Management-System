@@ -1,36 +1,54 @@
 {% extends "guide/_base.html" %}
 {% load ui %}
 {% block title %}Booking {{ booking.reference }}{% endblock %}
-{% block crumbs %}Guide / <a href="{% url 'guide:bookings' %}">Bookings</a>{% endblock %}
-{% block page_title %}Booking {{ booking.reference }}{% endblock %}
+{% block crumbs %}Guide / <a href="{% url 'guide:bookings' %}">Trips & requests</a>{% endblock %}
+{% block page_title %}{{ booking.tour.title }} · {{ booking.reference }}{% endblock %}
 {% block content %}
-<div class="row g-3">
-  <div class="col-lg-7">
-    <div class="panel mb-3"><div class="panel-head"><h2>Traveler</h2><span class="badge badge-soft-{{ booking.status|status_color }}">{{ booking.get_status_display }}</span></div>
-      <div class="panel-body">
-        <div class="row g-3 small">
-          <div class="col-sm-6"><div class="text-muted-2">Lead traveler</div><div class="fw-600">{{ booking.full_name }}</div></div>
-          <div class="col-sm-6"><div class="text-muted-2">Group size</div><div class="fw-600">{{ booking.travelers }} traveler{{ booking.travelers|pluralize }}</div></div>
-          <div class="col-sm-6"><div class="text-muted-2">Phone</div><a class="fw-600" href="tel:{{ booking.phone|cut:' ' }}">{{ booking.phone }}</a></div>
-          <div class="col-sm-6"><div class="text-muted-2">Email</div><a class="fw-600" href="mailto:{{ booking.email }}">{{ booking.email }}</a></div>
-          <div class="col-sm-6"><div class="text-muted-2">Dates</div><div class="fw-600">{{ booking.travel_date|date:"M d" }} → {{ booking.end_date|date:"M d, Y" }}</div></div>
-          <div class="col-sm-6"><div class="text-muted-2">Payment</div><span class="badge badge-soft-{{ booking.payment_status|status_color }}">{{ booking.get_payment_status_display }}</span></div>
-          <div class="col-12"><div class="text-muted-2">Special requests</div><div>{{ booking.special_requests|default:"None"|linebreaksbr }}</div></div>
-        </div>
-      </div>
-    </div>
-    {% if form %}
-    <form method="post" class="panel" novalidate>{% csrf_token %}
-      <div class="panel-head"><h2>Update booking</h2></div>
-      <div class="panel-body">{% for field in form %}{% include "partials/_field.html" %}{% endfor %}<div class="form-text">Cancellations are handled by the office - contact an administrator.</div></div>
-      <div class="panel-head border-top border-bottom-0 justify-content-end"><a class="btn btn-light" href="{% url 'guide:bookings' %}">Back</a><button class="btn btn-primary">Save</button></div>
+{% if booking.can_guide_respond %}
+<div class="panel mb-3 border-warning" id="respond">
+  <div class="panel-head"><div><h2><i class="bi bi-inbox text-warning me-1"></i> Trip request - your response is needed</h2><div class="sub">{{ booking.travel_date|date:"l, M d Y" }} → {{ booking.end_date|date:"M d" }} · {{ booking.travelers }} traveler{{ booking.travelers|pluralize }}</div></div></div>
+  <div class="panel-body">
+    {% if conflicts %}<div class="alert alert-warning py-2 small"><i class="bi bi-exclamation-triangle"></i> You already accepted overlapping trips: {% for c in conflicts %}<a href="{% url 'guide:booking_detail' c.pk %}">{{ c.tour.title }} ({{ c.travel_date|date:"M d" }})</a>{% if not forloop.last %}, {% endif %}{% endfor %}.</div>{% endif %}
+    {% if time_off %}<div class="alert alert-danger py-2 small"><i class="bi bi-calendar-x"></i> This trip overlaps your time off.</div>{% endif %}
+    <form method="post" action="{% url 'guide:respond' booking.pk %}" class="row g-2 align-items-center">{% csrf_token %}
+      <div class="col-md-auto"><button class="btn btn-primary" name="action" value="accept"><i class="bi bi-check-lg"></i> Accept trip</button></div>
+      <div class="col-md">{{ decline_form.reason }}</div>
+      <div class="col-md-auto"><button class="btn btn-outline-danger" name="action" value="decline"><i class="bi bi-x-lg"></i> Decline</button></div>
     </form>
-    {% else %}<div class="alert alert-danger">This booking was cancelled.</div>{% endif %}
   </div>
-  <div class="col-lg-5">
-    <div class="panel overflow-hidden"><img src="{{ booking.tour.cover }}" class="w-100" style="aspect-ratio:16/9;object-fit:cover" alt="">
-      <div class="panel-body"><div class="fw-600">{{ booking.tour.title }}</div><div class="small text-muted-2 mb-3">{{ booking.tour.destination }}</div>
-        <a class="btn btn-sm btn-soft" href="{% url 'guide:manifest' booking.tour.slug booking.travel_date|date:'Y-m-d' %}"><i class="bi bi-list-check"></i> Departure manifest</a></div></div>
+</div>
+{% elif booking.guide_status == 'declined' %}<div class="alert alert-secondary">You declined this trip{% if booking.guide_decline_reason %}: “{{ booking.guide_decline_reason }}”{% endif %}. The office is reassigning it.</div>{% endif %}
+
+<div class="row g-3">
+  <div class="col-xl-7 d-flex flex-column gap-3">
+    <div class="panel"><div class="panel-head"><h2>Trip details</h2><div class="d-flex gap-2"><span class="badge {% if booking.guide_status == 'accepted' %}badge-soft-success{% elif booking.guide_status == 'declined' %}badge-soft-danger{% else %}badge-soft-warning{% endif %}">{{ booking.get_guide_status_display }}</span><span class="badge badge-soft-{{ booking.status|status_color }}">{{ booking.get_status_display }}</span></div></div>
+      <div class="panel-body"><div class="row g-3 small">
+        <div class="col-sm-6"><div class="text-muted-2">Lead traveler</div><div class="fw-600">{{ booking.full_name }}</div></div>
+        <div class="col-sm-6"><div class="text-muted-2">Group size</div><div class="fw-600">{{ booking.travelers }} traveler{{ booking.travelers|pluralize }}</div></div>
+        <div class="col-sm-6"><div class="text-muted-2">Phone</div><a class="fw-600" href="tel:{{ booking.phone|cut:' ' }}">{{ booking.phone }}</a></div>
+        <div class="col-sm-6"><div class="text-muted-2">Email</div><a class="fw-600" href="mailto:{{ booking.email }}">{{ booking.email }}</a></div>
+        <div class="col-sm-6"><div class="text-muted-2">Dates</div><div class="fw-600">{{ booking.travel_date|date:"D, M d" }} → {{ booking.end_date|date:"D, M d Y" }}</div></div>
+        <div class="col-sm-6"><div class="text-muted-2">Payment</div><span class="badge badge-soft-{{ booking.payment_status|status_color }}">{{ booking.get_payment_status_display }}</span></div>
+        <div class="col-12"><div class="text-muted-2">Special requests</div><div>{{ booking.special_requests|default:"None"|linebreaksbr }}</div></div>
+      </div></div>
+    </div>
+    <div class="panel"><div class="panel-head"><h2>Participants</h2><span class="sub">{{ booking.participants.count }} of {{ booking.travelers }} named by the traveler</span></div>
+      {% for p in booking.participants.all %}<div class="list-row"><span class="avatar">{{ p.full_name|first|upper }}</span><div class="grow"><div class="title">{{ p.full_name }}</div><div class="sub">{% if p.age %}{{ p.age }} yrs{% endif %}{% if p.nationality %} · {{ p.nationality }}{% endif %}{% if p.notes %} · <span class="text-warning">{{ p.notes }}</span>{% endif %}</div></div></div>
+      {% empty %}<div class="panel-body small text-muted-2">The traveler hasn't added names yet. You can ask them in the chat.</div>{% endfor %}
+    </div>
+    {% include "messaging/_thread.html" with chat_title="Chat with the traveler" chat_subtitle=booking.full_name %}
+  </div>
+  <div class="col-xl-5 d-flex flex-column gap-3">
+    <div class="panel overflow-hidden"><img src="{{ booking.tour.cover }}" class="w-100" style="aspect-ratio:16/8;object-fit:cover" alt="">
+      <div class="panel-body"><div class="fw-600">{{ booking.tour.title }}</div><div class="small text-muted-2 mb-3">{{ booking.tour.destination }} · {{ booking.tour.duration_days }} day{{ booking.tour.duration_days|pluralize }} · {{ booking.tour.get_difficulty_display }}</div>
+        {% if booking.tour.itinerary_list %}<div class="small-caps text-muted-2 mb-2">Itinerary</div><ol class="small ps-3">{% for d in booking.tour.itinerary_list %}<li class="mb-1">{{ d }}</li>{% endfor %}</ol>{% endif %}
+        <div class="d-flex gap-2 flex-wrap"><a class="btn btn-sm btn-soft" href="{% url 'guide:manifest' booking.tour.slug booking.travel_date|date:'Y-m-d' %}"><i class="bi bi-list-check"></i> Departure manifest</a>
+        {% if booking.guide_status == 'accepted' and booking.status == 'confirmed' and booking.has_started %}<form method="post" action="{% url 'guide:respond' booking.pk %}">{% csrf_token %}<button class="btn btn-sm btn-light" name="action" value="complete"><i class="bi bi-flag"></i> Mark completed</button></form>{% endif %}</div>
+      </div></div>
+    <form method="post" class="panel" novalidate>{% csrf_token %}
+      <div class="panel-head"><h2>My notes</h2></div>
+      <div class="panel-body">{% include "partials/_field.html" with field=notes_form.guide_notes %}<button class="btn btn-primary btn-sm" name="save_notes" value="1">Save notes</button></div>
+    </form>
   </div>
 </div>
 {% endblock %}

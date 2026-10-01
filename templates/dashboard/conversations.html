@@ -1,0 +1,7 @@
+{% extends "dashboard/_base.html" %}
+{% block title %}Trip conversations{% endblock %}
+{% block page_title %}Trip conversations{% endblock %}
+{% block content %}
+<p class="text-muted-2 small">Every chat between travelers and guides. Open one to read it or reply as the office.</p>
+<div style="max-width:960px">{% include "messaging/_thread_list.html" with link="admin" %}</div>
+{% endblock %}

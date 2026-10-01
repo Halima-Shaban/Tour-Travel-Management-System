@@ -11,7 +11,9 @@ from django.utils import timezone
 from accounts.models import Profile
 from blog.models import Category, Comment, Post
 from core.models import ContactMessage, NewsletterSubscriber, SiteSettings
-from tours.models import Booking, Destination, Review, Tour
+from messaging.models import Message, Thread
+from notifications.models import Notification
+from tours.models import Booking, Destination, GuideUnavailability, Participant, Review, Tour
 
 DESTINATIONS = [
     ("Cairo", "Egypt", "Pyramids of Giza, the Egyptian Museum and the buzzing lanes of Khan El Khalili."),
@@ -91,10 +93,42 @@ class Command(BaseCommand):
         Profile.objects.filter(user=user).update(role=role, **profile)
         return user
 
+    def seed_collaboration(self, guides, admin):
+        """Participants, chats, a declined request, time off and a few notifications."""
+        today = timezone.localdate()
+        upcoming = list(Booking.objects.filter(travel_date__gte=today).exclude(status="cancelled").select_related("tour", "user", "guide"))
+        names = ["Sara Ali", "Omar Ali", "Lina Ali", "John Carter", "Emma Schmidt", "Lucas Martin", "Mona Farouk", "Yusuf Demir"]
+        for booking in upcoming[:12]:
+            if not booking.participants.exists():
+                for i in range(booking.travelers):
+                    Participant.objects.create(booking=booking, full_name=names[(booking.pk + i) % len(names)],
+                                               age=random.randint(8, 70), nationality=random.choice(["Egypt", "UK", "Germany", "USA"]),
+                                               notes=random.choice(["", "", "Vegetarian", "Nut allergy"]))
+        if not Message.objects.exists():
+            for booking in upcoming[:5]:
+                if booking.user and booking.guide:
+                    thread, _ = Thread.objects.get_or_create(booking=booking)
+                    Message.objects.create(thread=thread, sender=booking.user, body="Hi! Where exactly do we meet on the first day?")
+                    Message.objects.create(thread=thread, sender=booking.guide, body="Hello! I'll pick you up from your hotel lobby at 7:30am. Please share the hotel name.")
+                    Message.objects.create(thread=thread, sender=booking.user, body="Perfect, we're at the Nile View Hotel. Thank you!")
+        declined = next((b for b in upcoming if b.guide_status == "pending" and b.guide), None)
+        if declined and not Booking.objects.filter(guide_status="declined").exists():
+            Booking.objects.filter(pk=declined.pk).update(guide_status="declined", guide_decline_reason="Already guiding a private group that week")
+        if not GuideUnavailability.objects.exists():
+            GuideUnavailability.objects.create(guide=guides[0], start_date=today + timedelta(days=40), end_date=today + timedelta(days=44), reason="Family wedding")
+        if not Notification.objects.exists():
+            for g in guides:
+                n = Booking.objects.filter(guide=g, guide_status="pending", travel_date__gte=today).count()
+                if n:
+                    Notification.objects.create(recipient=g, kind="guide", title=f"You have {n} trip request(s) to answer", url="/guide/bookings/")
+            Notification.objects.create(recipient=admin, kind="guide", title="A guide declined a trip - reassign it", url="/dashboard/bookings/?guide=needs")
+
     @transaction.atomic
     def handle(self, *args, **options):
         random.seed(42)
         if options["flush"]:
+            Notification.objects.all().delete()
+            GuideUnavailability.objects.all().delete()
             Booking.objects.all().delete()
             Review.objects.all().delete()
             Tour.objects.all().delete()
@@ -170,14 +204,20 @@ class Command(BaseCommand):
                     status = random.choice(["completed"] * 8 + ["cancelled"])
                 else:
                     status = random.choice(["confirmed", "confirmed", "pending", "pending", "cancelled"])
+                paid = status in ("completed", "confirmed")
                 booking = Booking(
                     tour=tour, user=customer, full_name=customer.get_full_name(), email=customer.email,
                     phone="+20 111 222 3333", travel_date=travel_date, travelers=random.randint(1, 4), status=status,
-                    payment_status="paid" if status in ("completed", "confirmed") else ("refunded" if status == "cancelled" and random.random() < .5 else "unpaid"),
+                    payment_status="paid" if paid else ("refunded" if status == "cancelled" and random.random() < .5 else "unpaid"),
+                    guide_status="accepted" if paid else "pending",
                 )
                 booking.save()
+                if paid:
+                    Booking.objects.filter(pk=booking.pk).update(amount_paid=booking.total_price, paid_at=timezone.now())
                 created_at = timezone.now() + timedelta(days=min(offset, 0) - random.randint(3, 40))
                 Booking.objects.filter(pk=booking.pk).update(created_at=created_at)
+
+        self.seed_collaboration(guides, admin)
 
         for booking in Booking.objects.filter(status="completed").select_related("tour", "user")[:45]:
             rating, comment = random.choice(REVIEWS)

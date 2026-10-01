@@ -4,10 +4,12 @@
 {% block role_label %}Guide{% endblock %}
 {% block crumbs %}Guide{% endblock %}
 {% block sidebar %}
+{% guide_counts as gc %}
 <div class="group">My work</div>
 <a class="{% active 'guide:home' exact=True %}" href="{% url 'guide:home' %}"><i class="bi bi-grid-1x2"></i> Overview</a>
 <a class="{% active 'guide:calendar' %}" href="{% url 'guide:calendar' %}"><i class="bi bi-calendar3"></i> Schedule</a>
-<a class="{% active 'guide:bookings' %}" href="{% url 'guide:bookings' %}"><i class="bi bi-people"></i> Travelers & bookings</a>
+<a class="{% active 'guide:bookings' %}" href="{% url 'guide:bookings' %}"><i class="bi bi-people"></i> Trips & requests{% if gc.requests %}<span class="count">{{ gc.requests }}</span>{% endif %}</a>
+<a class="{% active 'guide:inbox' %}" href="{% url 'guide:inbox' %}"><i class="bi bi-chat-dots"></i> Messages{% if gc.unread %}<span class="count">{{ gc.unread }}</span>{% endif %}</a>
 <a class="{% active 'guide:tours' %}" href="{% url 'guide:tours' %}"><i class="bi bi-map"></i> My tours</a>
 <a class="{% active 'guide:reviews' %}" href="{% url 'guide:reviews' %}"><i class="bi bi-star"></i> Reviews</a>
 <div class="group">Account</div>

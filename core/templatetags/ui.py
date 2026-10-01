@@ -85,3 +85,20 @@ def active(context, *prefixes, exact=False):
         if (exact and path == url) or (not exact and path.startswith(url)):
             return "active"
     return ""
+
+
+@register.simple_tag(takes_context=True)
+def guide_counts(context):
+    """Badge counters for the guide sidebar."""
+    from django.utils import timezone
+
+    from messaging.services import unread_total
+    from tours.models import Booking
+
+    user = context["request"].user
+    requests = (
+        Booking.objects.filter(guide=user, guide_status="pending", travel_date__gte=timezone.localdate())
+        .exclude(status="cancelled")
+        .count()
+    )
+    return {"requests": requests, "unread": unread_total(user)}

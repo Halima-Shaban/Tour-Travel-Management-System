@@ -11,8 +11,8 @@
         <div class="col-md-3"><img src="{{ b.tour.cover }}" class="w-100 h-100 object-fit-cover" style="min-height:150px;max-height:170px" alt=""></div>
         <div class="col-md-9 p-4">
           <div class="d-flex flex-wrap justify-content-between gap-2 mb-2">
-            <div><span class="font-monospace small text-muted-2">{{ b.reference }}</span><h3 class="h5 mb-0"><a class="text-body" href="{{ b.tour.get_absolute_url }}">{{ b.tour.title }}</a></h3></div>
-            <div><span class="badge badge-soft-{{ b.status|status_color }}">{{ b.get_status_display }}</span> <span class="badge badge-soft-{{ b.payment_status|status_color }}">{{ b.get_payment_status_display }}</span></div>
+            <div><span class="font-monospace small text-muted-2">{{ b.reference }}</span><h3 class="h5 mb-0"><a class="text-body" href="{{ b.get_absolute_url }}">{{ b.tour.title }}</a></h3></div>
+            <div><span class="badge badge-soft-{{ b.status|status_color }}">{{ b.get_status_display }}</span> <span class="badge badge-soft-{{ b.payment_status|status_color }}">{{ b.get_payment_status_display }}</span>{% if b.status != 'cancelled' %} <span class="badge {% if b.guide_status == 'accepted' %}badge-soft-success{% else %}badge-soft-secondary{% endif %}">{% if b.guide_status == 'accepted' %}Guide confirmed{% else %}Awaiting guide{% endif %}</span>{% endif %}</div>
           </div>
           <div class="d-flex flex-wrap gap-4 small text-muted-2 mb-3">
             <span><i class="bi bi-calendar3"></i> {{ b.travel_date|date:"D, M d Y" }}</span>
@@ -21,7 +21,9 @@
             <span class="fw-600 text-brand">{{ b.total_price|money:site.currency_symbol }}</span>
           </div>
           <div class="d-flex gap-2">
-            <a class="btn btn-sm btn-outline-primary" href="{{ b.tour.get_absolute_url }}">View tour</a>
+            <a class="btn btn-sm btn-primary" href="{{ b.get_absolute_url }}">Manage trip</a>
+            <a class="btn btn-sm btn-outline-primary" href="{{ b.get_absolute_url }}#chat"><i class="bi bi-chat-dots"></i> Message</a>
+            {% include "accounts/_pay_button.html" with booking=b pay_btn_class="btn-sm" %}
             {% if b.status == 'completed' %}<a class="btn btn-sm btn-soft" href="{{ b.tour.get_absolute_url }}#reviews">Write a review</a>{% endif %}
             {% if b.can_cancel %}<form method="post" action="{% url 'accounts:cancel_booking' b.reference %}" onsubmit="return confirm('Cancel this booking?')">{% csrf_token %}<button class="btn btn-sm btn-outline-danger">Cancel</button></form>{% endif %}
           </div>

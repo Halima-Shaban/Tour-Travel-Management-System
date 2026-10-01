@@ -40,6 +40,9 @@ INSTALLED_APPS = [
     "dashboard",
     "guide",
     "chatbot",
+    "notifications",
+    "messaging",
+    "payments",
 ]
 
 MIDDLEWARE = [
@@ -124,6 +127,12 @@ GROQ_MODEL = env("GROQ_MODEL", "llama-3.3-70b-versatile")
 GROQ_FALLBACK_MODEL = env("GROQ_FALLBACK_MODEL", "llama-3.1-8b-instant")
 GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions"
 CHATBOT_MAX_MESSAGES_PER_HOUR = int(env("CHATBOT_MAX_MESSAGES_PER_HOUR", "40") or 40)
+
+# Payments (Stripe Checkout). Leave the secret key empty to disable online payments.
+STRIPE_SECRET_KEY = env("STRIPE_SECRET_KEY")
+STRIPE_PUBLISHABLE_KEY = env("STRIPE_PUBLISHABLE_KEY")
+STRIPE_WEBHOOK_SECRET = env("STRIPE_WEBHOOK_SECRET")
+STRIPE_CURRENCY = env("STRIPE_CURRENCY", "usd")
 
 if not DEBUG:
     SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")

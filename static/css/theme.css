@@ -105,3 +105,30 @@ a:hover { color: var(--brand-dark); }
 .pagination .active .page-link { background: var(--brand); color: #fff; }
 .nav-pills .nav-link { color: var(--muted); border-radius: 999px; font-weight: 500; }
 .nav-pills .nav-link.active { background: var(--brand); color: #fff; }
+
+/* Notification bell (site + dashboards) */
+.bell-count { position: absolute; top: 2px; right: 0; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px; background: #ef4444; color: #fff; font-size: .65rem; font-weight: 700; display: grid; place-items: center; border: 2px solid var(--surface); }
+.notif-menu { width: 340px; max-width: calc(100vw - 24px); overflow: hidden; }
+.notif-item { display: flex; gap: .75rem; align-items: flex-start; padding: .75rem 1rem; color: inherit; border-bottom: 1px solid var(--line); }
+.notif-item:hover { background: var(--surface-2); color: inherit; }
+.notif-item.unread { background: var(--brand-soft); }
+.min-w-0 { min-width: 0; }
+
+/* Booking chat (traveler / guide / office) */
+.chat-box { border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); display: flex; flex-direction: column; overflow: hidden; }
+.chat-box-head { display: flex; gap: .75rem; align-items: center; padding: .85rem 1.1rem; border-bottom: 1px solid var(--line); }
+.chat-box-body { height: 360px; overflow-y: auto; padding: 1rem; background: var(--surface-2); display: flex; flex-direction: column; gap: .75rem; }
+.bubble-row { display: flex; flex-direction: column; align-items: flex-start; max-width: 82%; }
+.bubble-row.mine { align-self: flex-end; align-items: flex-end; }
+.bubble-row .bubble { background: var(--surface); border: 1px solid var(--line); padding: .6rem .85rem; border-radius: 14px; border-bottom-left-radius: 4px; font-size: .9rem; word-break: break-word; }
+.bubble-row.mine .bubble { background: var(--brand); border-color: var(--brand); color: #fff; border-radius: 14px; border-bottom-right-radius: 4px; }
+.bubble-row .meta { font-size: .7rem; color: var(--muted); margin-top: .2rem; }
+.bubble-row .role { color: var(--brand); font-weight: 600; }
+.chat-box-form { display: flex; gap: .5rem; padding: .75rem; border-top: 1px solid var(--line); }
+.chat-box-form textarea { flex: 1; resize: none; border: 1px solid var(--line); border-radius: 12px; padding: .55rem .8rem; background: var(--surface-2); color: inherit; max-height: 120px; }
+.chat-box-form textarea:focus { outline: none; border-color: var(--brand); }
+.chat-box-form .btn { width: 46px; padding: 0; }
+.step-track { display: flex; gap: .5rem; flex-wrap: wrap; }
+.step-track .step { flex: 1; min-width: 120px; padding: .65rem .8rem; border-radius: 10px; background: var(--surface-2); font-size: .8rem; color: var(--muted); }
+.step-track .step.done { background: var(--brand-soft); color: var(--brand); font-weight: 600; }
+.step-track .step.bad { background: rgba(220, 38, 38, .1); color: #b91c1c; font-weight: 600; }
