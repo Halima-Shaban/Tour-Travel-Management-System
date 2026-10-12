@@ -2,6 +2,7 @@
 
 | Guide | What it covers |
 |-------|----------------|
+| **[Full System Documentation](FULL_DOCUMENTATION.md)** | **Complete end-to-end documentation across all modules, models, workflows, and APIs** |
 | [Installation](installation.md) | Local setup, demo data, running tests |
 | [Configuration](configuration.md) | Every `.env` variable |
 | [Customization](customization.md) | Branding, theme, content and chatbot settings - no code needed |

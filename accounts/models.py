@@ -41,3 +41,95 @@ def ensure_profile(sender, instance, created, **kwargs):
     if created:
         role = Profile.Role.ADMIN if instance.is_superuser else Profile.Role.CUSTOMER
         Profile.objects.get_or_create(user=instance, defaults={"role": role})
+
+
+class EmailOTP(models.Model):
+    class Purpose(models.TextChoices):
+        SIGNUP = "signup", "Sign Up Verification"
+        RESET_PASSWORD = "reset_password", "Password Reset"
+
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name="email_otps",
+    )
+    email = models.EmailField(db_index=True)
+    code = models.CharField(max_length=6)
+    purpose = models.CharField(max_length=20, choices=Purpose.choices, default=Purpose.SIGNUP)
+    created_at = models.DateTimeField(auto_now_add=True)
+    expires_at = models.DateTimeField()
+    is_used = models.BooleanField(default=False)
+    attempts = models.PositiveSmallIntegerField(default=0)
+
+    class Meta:
+        ordering = ["-created_at"]
+        indexes = [
+            models.Index(fields=["email", "purpose", "is_used"]),
+        ]
+
+    def __str__(self):
+        status = "Used" if self.is_used else ("Expired" if self.is_expired else "Active")
+        return f"OTP for {self.email} ({self.purpose}) - {status}"
+
+    @property
+    def is_expired(self):
+        from django.utils import timezone
+        return timezone.now() > self.expires_at
+
+    @classmethod
+    def generate_otp(cls, email, purpose, user=None, validity_minutes=10):
+        import secrets
+        from datetime import timedelta
+        from django.utils import timezone
+
+        clean_email = email.strip().lower()
+        # Invalidate existing unused OTPs for this email and purpose
+        cls.objects.filter(email__iexact=clean_email, purpose=purpose, is_used=False).update(is_used=True)
+
+        # Generate 6-digit code
+        code = f"{secrets.randbelow(900000) + 100000}"
+        expires_at = timezone.now() + timedelta(minutes=validity_minutes)
+
+        otp = cls.objects.create(
+            user=user,
+            email=clean_email,
+            code=code,
+            purpose=purpose,
+            expires_at=expires_at,
+        )
+        return otp
+
+    @classmethod
+    def verify_otp(cls, email, code, purpose, max_attempts=5):
+        from django.utils import timezone
+
+        clean_email = email.strip().lower()
+        clean_code = str(code).strip()
+
+        otp = cls.objects.filter(
+            email__iexact=clean_email,
+            purpose=purpose,
+            is_used=False,
+            expires_at__gte=timezone.now(),
+        ).first()
+
+        if not otp:
+            return False, "Invalid or expired verification code. Please request a new one."
+
+        if otp.attempts >= max_attempts:
+            otp.is_used = True
+            otp.save(update_fields=["is_used"])
+            return False, "Too many failed attempts. Please request a new code."
+
+        if otp.code != clean_code:
+            otp.attempts += 1
+            otp.save(update_fields=["attempts"])
+            remaining = max_attempts - otp.attempts
+            return False, f"Incorrect code. {remaining} attempt(s) remaining."
+
+        otp.is_used = True
+        otp.save(update_fields=["is_used"])
+        return True, otp
+

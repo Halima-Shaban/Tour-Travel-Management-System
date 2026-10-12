@@ -1,0 +1,139 @@
+{% load static %}<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Email · {{ site.site_name }}</title>
+    {% if site.favicon %}<link rel="icon" href="{{ site.favicon.url }}">{% else %}<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✈️</text></svg>">{% endif %}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
+    <link rel="stylesheet" href="{% static 'css/auth.css' %}">
+    <style>
+      :root {
+        --primary-color: {{ site.primary_color|default:"#4EA685" }};
+        --secondary-color: {{ site.secondary_color|default:"#57B894" }};
+      }
+    </style>
+</head>
+<body>
+    <!-- BACK TO SITE BUTTON -->
+    <a href="{% url 'core:home' %}" class="back-home-btn" title="Return to {{ site.site_name }}">
+        <i class='bx bx-arrow-back'></i>
+        <span>{{ site.site_name }}</span>
+    </a>
+
+    <div class="auth-standalone-wrapper">
+        <div class="auth-standalone-card">
+            <div class="auth-badge-icon">
+                <i class='bx bx-shield-quarter'></i>
+            </div>
+            <h2>Verify your email</h2>
+            <p class="subtext">
+                We've sent a 6-digit verification code to<br>
+                <strong>{{ email }}</strong>
+            </p>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="auth-alert {% if message.tags == 'error' %}error{% elif message.tags == 'success' %}success{% else %}info{% endif %}">
+                        <i class='bx {% if message.tags == "error" %}bx-error-circle{% elif message.tags == "success" %}bx-check-circle{% else %}bx-info-circle{% endif %}'></i>
+                        <div>{{ message }}</div>
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            {% if form.errors %}
+                <div class="auth-alert error">
+                    <i class='bx bx-error-circle'></i>
+                    <div>
+                        {% for field in form %}
+                            {% for error in field.errors %}{{ error }}<br>{% endfor %}
+                        {% endfor %}
+                        {% for error in form.non_field_errors %}{{ error }}<br>{% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+
+            <form method="post" action="{% url 'accounts:verify_signup_otp' %}" id="otpForm">
+                {% csrf_token %}
+                <div class="otp-field-container">
+                    {{ form.code }}
+                </div>
+                <button type="submit" class="auth-btn-primary" id="btnVerify">
+                    <i class='bx bx-check-circle'></i> Verify & Complete Sign Up
+                </button>
+            </form>
+
+            <div class="resend-box">
+                <p>Didn't receive the verification code?</p>
+                <form method="post" action="{% url 'accounts:resend_otp' %}" id="resendForm" style="margin-top:0.5rem;">
+                    {% csrf_token %}
+                    <input type="hidden" name="purpose" value="signup">
+                    <input type="hidden" name="email" value="{{ email }}">
+                    <button type="submit" class="link-btn" id="btnResend">
+                        <i class='bx bx-refresh'></i> Resend code
+                    </button>
+                    <span id="countdownText" style="display:none;font-weight:500;color:#94a3b8;font-size:0.85rem;"></span>
+                </form>
+            </div>
+
+            <div class="auth-footer-links">
+                <a href="{% url 'accounts:signup' %}">
+                    <i class='bx bx-arrow-back'></i> Change email / Sign up again
+                </a>
+                <span>Already have an active account? <a href="{% url 'accounts:login' %}">Sign in</a></span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Auto-focus and numeric filter
+        const input = document.querySelector('.otp-code-input');
+        if (input) {
+            input.focus();
+            input.addEventListener('input', function(e) {
+                this.value = this.value.replace(/[^0-9]/g, '').slice(0, 6);
+                if (this.value.length === 6) {
+                    // Optional auto-submit when 6 digits are typed
+                    // document.getElementById('otpForm').submit();
+                }
+            });
+        }
+
+        // Resend cooldown timer
+        const btnResend = document.getElementById('btnResend');
+        const countdownText = document.getElementById('countdownText');
+        const lastSentKey = 'otp_resend_cooldown_signup';
+
+        function startCooldown(seconds) {
+            let remaining = seconds;
+            btnResend.style.display = 'none';
+            countdownText.style.display = 'inline';
+            countdownText.textContent = `Resend available in ${remaining}s`;
+
+            const interval = setInterval(() => {
+                remaining -= 1;
+                if (remaining <= 0) {
+                    clearInterval(interval);
+                    btnResend.style.display = 'inline';
+                    countdownText.style.display = 'none';
+                    sessionStorage.removeItem(lastSentKey);
+                } else {
+                    countdownText.textContent = `Resend available in ${remaining}s`;
+                }
+            }, 1000);
+        }
+
+        const storedTime = sessionStorage.getItem(lastSentKey);
+        if (storedTime) {
+            const elapsed = Math.floor((Date.now() - parseInt(storedTime, 10)) / 1000);
+            if (elapsed < 45) {
+                startCooldown(45 - elapsed);
+            }
+        }
+
+        document.getElementById('resendForm').addEventListener('submit', function() {
+            sessionStorage.setItem(lastSentKey, Date.now().toString());
+        });
+    </script>
+</body>
+</html>

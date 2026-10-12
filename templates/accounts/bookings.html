@@ -20,7 +20,7 @@
             <span><i class="bi bi-geo-alt"></i> {{ b.tour.destination.name }}</span>
             <span class="fw-600 text-brand">{{ b.total_price|money:site.currency_symbol }}</span>
           </div>
-          <div class="d-flex gap-2">
+          <div class="d-flex flex-wrap gap-2">
             <a class="btn btn-sm btn-primary" href="{{ b.get_absolute_url }}">Manage trip</a>
             <a class="btn btn-sm btn-outline-primary" href="{{ b.get_absolute_url }}#chat"><i class="bi bi-chat-dots"></i> Message</a>
             {% include "accounts/_pay_button.html" with booking=b pay_btn_class="btn-sm" %}

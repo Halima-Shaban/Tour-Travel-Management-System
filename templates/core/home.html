@@ -10,10 +10,10 @@
     <p class="lead mb-5">{{ site.hero_subtitle }}</p>
     <form class="search-panel" action="{% url 'tours:list' %}" method="get">
       <div class="row g-2">
-        <div class="col-md-5"><div class="position-relative"><i class="bi bi-search position-absolute text-muted-2" style="left:16px;top:16px"></i><input type="text" name="q" class="form-control ps-5" placeholder="Where do you want to go?"></div></div>
-        <div class="col-6 col-md-3">{{ search_form.category }}</div>
-        <div class="col-6 col-md-2">{{ search_form.duration }}</div>
-        <div class="col-md-2 d-grid"><button class="btn btn-primary"><i class="bi bi-search me-1"></i> Search</button></div>
+        <div class="col-12 col-md-4 col-lg-5"><div class="position-relative"><i class="bi bi-search position-absolute text-muted-2" style="left:16px;top:16px"></i><input type="text" name="q" class="form-control ps-5" placeholder="Where do you want to go?"></div></div>
+        <div class="col-6 col-md-3 col-lg-3">{{ search_form.category }}</div>
+        <div class="col-6 col-md-2 col-lg-2">{{ search_form.duration }}</div>
+        <div class="col-12 col-md-3 col-lg-2 d-grid"><button class="btn btn-primary text-nowrap d-inline-flex align-items-center justify-content-center"><i class="bi bi-search me-2"></i>Search</button></div>
       </div>
     </form>
   </div>
@@ -123,9 +123,15 @@
       <div class="row align-items-center g-4">
         <div class="col-lg-6"><h2 class="mb-2">Get exclusive travel deals</h2><p class="mb-0 opacity-75">Join our newsletter - early-bird offers and new tours, once a month. No spam.</p></div>
         <div class="col-lg-6">
-          <form class="d-flex gap-2" method="post" action="{% url 'core:newsletter' %}">{% csrf_token %}
-            <input type="email" name="email" class="form-control" placeholder="Your email address" required>
-            <button class="btn btn-accent px-4">Subscribe</button>
+          <form id="newsletter-form" class="d-flex flex-column gap-2" method="post" action="{% url 'core:newsletter' %}">{% csrf_token %}
+            <div class="d-flex flex-column flex-sm-row gap-2">
+              <input id="newsletter-email" type="email" name="email" class="form-control" placeholder="Your email address" required>
+              <button id="newsletter-btn" class="btn btn-accent px-4 text-nowrap" type="submit">
+                <span id="newsletter-btn-label"><i class="bi bi-envelope-check me-1"></i>Subscribe</span>
+                <span id="newsletter-btn-spinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+              </button>
+            </div>
+            <div id="newsletter-feedback" class="small fw-500 d-none"></div>
           </form>
         </div>
       </div>

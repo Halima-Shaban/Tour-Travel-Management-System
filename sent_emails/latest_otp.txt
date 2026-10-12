@@ -1,0 +1,16 @@
+Latest OTP Code: 186950
+Email: wanderer@example.com
+Purpose: signup
+Expires at: 2026-10-10 05:14:14.578974+00:00
+
+Hello,
+
+Your verification code to complete your account registration on GoTrip is:
+
+    186950
+
+This code will expire in 10 minutes.
+If you did not request this code, please ignore this email.
+
+Best regards,
+The GoTrip Team

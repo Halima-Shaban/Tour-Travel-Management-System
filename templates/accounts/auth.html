@@ -1,0 +1,258 @@
+{% load static %}<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{{ block.super|default:"Authentication" }} · {{ site.site_name }}{% endblock %}</title>
+    {% if site.favicon %}<link rel="icon" href="{{ site.favicon.url }}">{% else %}<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✈️</text></svg>">{% endif %}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/boxicons@latest/css/boxicons.min.css">
+    <link rel="stylesheet" href="{% static 'css/auth.css' %}">
+    <style>
+      :root {
+        --primary-color: {{ site.primary_color|default:"#4EA685" }};
+        --secondary-color: {{ site.secondary_color|default:"#57B894" }};
+      }
+    </style>
+</head>
+<body>
+
+    <!-- BACK TO SITE BUTTON -->
+    <a href="{% url 'core:home' %}" class="back-home-btn" title="Return to {{ site.site_name }}">
+        <i class='bx bx-arrow-back'></i>
+        <span>{{ site.site_name }}</span>
+    </a>
+
+    <div id="container" class="container {% block initial_class %}{{ initial_mode|default:'sign-in' }}{% endblock %}" data-initial-mode="{% block initial_mode %}{{ initial_mode|default:'sign-in' }}{% endblock %}">
+		<!-- FORM SECTION -->
+		<div class="row">
+			<!-- SIGN UP -->
+			<div class="col align-items-center flex-col sign-up">
+				<div class="form-wrapper align-items-center">
+					<div class="form sign-up">
+						<form method="post" action="{% url 'accounts:signup' %}" id="signUpForm" novalidate>
+							{% csrf_token %}
+							<input type="hidden" name="next" value="{{ next|default:'' }}">
+
+							{% if signup_form.errors and initial_mode == 'sign-up' %}
+								<div class="auth-alert error">
+									<i class='bx bx-error-circle'></i>
+									<div>
+										{% if signup_form.non_field_errors %}
+											{{ signup_form.non_field_errors.0 }}
+										{% else %}
+											{% for field in signup_form %}
+												{% if field.errors %}{{ field.label }}: {{ field.errors.0 }}<br>{% endif %}
+											{% endfor %}
+										{% endif %}
+									</div>
+								</div>
+							{% endif %}
+
+							{% if messages and initial_mode == 'sign-up' %}
+								{% for message in messages %}
+									<div class="auth-alert {% if message.tags == 'error' %}error{% elif message.tags == 'success' %}success{% else %}info{% endif %}">
+										<i class='bx {% if message.tags == "error" %}bx-error-circle{% elif message.tags == "success" %}bx-check-circle{% else %}bx-info-circle{% endif %}'></i>
+										<div>{{ message }}</div>
+									</div>
+								{% endfor %}
+							{% endif %}
+
+							<div class="input-group">
+								<i class='bx bxs-user input-icon'></i>
+								<input type="text" name="username" placeholder="Username" required autocomplete="username" value="{{ signup_form.username.value|default:'' }}">
+							</div>
+							<div class="input-group">
+								<i class='bx bx-mail-send input-icon'></i>
+								<input type="email" name="email" placeholder="Email" required autocomplete="email" value="{{ signup_form.email.value|default:'' }}">
+							</div>
+							<div class="input-group">
+								<i class='bx bxs-lock-alt input-icon'></i>
+								<input type="password" name="password1" id="signup_password1" placeholder="Password" required autocomplete="new-password">
+								<i class='bx bx-hide password-toggle' onclick="togglePassword('signup_password1', this)" title="Show/Hide password"></i>
+							</div>
+							<div class="input-group">
+								<i class='bx bxs-lock-alt input-icon'></i>
+								<input type="password" name="password2" id="signup_password2" placeholder="Confirm password" required autocomplete="new-password">
+								<i class='bx bx-hide password-toggle' onclick="togglePassword('signup_password2', this)" title="Show/Hide password"></i>
+							</div>
+							<button type="submit" id="btnSignUp">
+								Sign up
+							</button>
+						</form>
+
+						<div class="social-list sign-up">
+							<div class="facebook-bg" title="Sign up with Facebook" onclick="socialAuthNotice('Facebook')">
+								<i class='bx bxl-facebook'></i>
+							</div>
+							<div class="google-bg" title="Sign up with Google" onclick="socialAuthNotice('Google')">
+								<i class='bx bxl-google'></i>
+							</div>
+							<div class="twitter-bg" title="Sign up with Twitter" onclick="socialAuthNotice('Twitter')">
+								<i class='bx bxl-twitter'></i>
+							</div>
+							<div class="insta-bg" title="Sign up with Instagram" onclick="socialAuthNotice('Instagram')">
+								<i class='bx bxl-instagram'></i>
+							</div>
+						</div>
+
+						<p>
+							<span>
+								Already have an account?
+							</span>
+							<b onclick="toggle('sign-in')" class="pointer">
+								Sign in here
+							</b>
+						</p>
+					</div>
+				</div>
+			
+			</div>
+			<!-- END SIGN UP -->
+			<!-- SIGN IN -->
+			<div class="col align-items-center flex-col sign-in">
+				<div class="form-wrapper align-items-center">
+					<div class="form sign-in">
+						<form method="post" action="{% url 'accounts:login' %}" id="signInForm" novalidate>
+							{% csrf_token %}
+							<input type="hidden" name="next" value="{{ next|default:'' }}">
+
+							{% if login_form.errors and initial_mode == 'sign-in' %}
+								<div class="auth-alert error">
+									<i class='bx bx-error-circle'></i>
+									<div>
+										{% if login_form.non_field_errors %}
+											{{ login_form.non_field_errors.0 }}
+										{% else %}
+											Please enter a valid username and password.
+										{% endif %}
+									</div>
+								</div>
+							{% endif %}
+
+							{% if messages and initial_mode == 'sign-in' %}
+								{% for message in messages %}
+									<div class="auth-alert {% if message.tags == 'error' %}error{% elif message.tags == 'success' %}success{% else %}info{% endif %}">
+										<i class='bx {% if message.tags == "error" %}bx-error-circle{% elif message.tags == "success" %}bx-check-circle{% else %}bx-info-circle{% endif %}'></i>
+										<div>{{ message }}</div>
+									</div>
+								{% endfor %}
+							{% endif %}
+
+							<div class="input-group">
+								<i class='bx bxs-user input-icon'></i>
+								<input type="text" name="username" placeholder="Username" required autocomplete="username" value="{{ login_form.username.value|default:'' }}">
+							</div>
+							<div class="input-group">
+								<i class='bx bxs-lock-alt input-icon'></i>
+								<input type="password" name="password" id="signin_password" placeholder="Password" required autocomplete="current-password">
+								<i class='bx bx-hide password-toggle' onclick="togglePassword('signin_password', this)" title="Show/Hide password"></i>
+							</div>
+							<button type="submit" id="btnSignIn">
+								Sign in
+							</button>
+						</form>
+
+						<p>
+							<b onclick="openForgotPassword(event)" class="pointer">
+								Forgot password?
+							</b>
+						</p>
+
+						<div class="social-list sign-in">
+							<div class="facebook-bg" title="Sign in with Facebook" onclick="socialAuthNotice('Facebook')">
+								<i class='bx bxl-facebook'></i>
+							</div>
+							<div class="google-bg" title="Sign in with Google" onclick="socialAuthNotice('Google')">
+								<i class='bx bxl-google'></i>
+							</div>
+							<div class="twitter-bg" title="Sign in with Twitter" onclick="socialAuthNotice('Twitter')">
+								<i class='bx bxl-twitter'></i>
+							</div>
+							<div class="insta-bg" title="Sign in with Instagram" onclick="socialAuthNotice('Instagram')">
+								<i class='bx bxl-instagram'></i>
+							</div>
+						</div>
+
+						<p>
+							<span>
+								Don't have an account?
+							</span>
+							<b onclick="toggle('sign-up')" class="pointer">
+								Sign up here
+							</b>
+						</p>
+					</div>
+				</div>
+				<div class="form-wrapper">
+		
+				</div>
+			</div>
+			<!-- END SIGN IN -->
+		</div>
+		<!-- END FORM SECTION -->
+		<!-- CONTENT SECTION -->
+		<div class="row content-row">
+			<!-- SIGN IN CONTENT -->
+			<div class="col align-items-center flex-col">
+				<div class="text sign-in">
+					<h2>
+						Welcome
+					</h2>
+					<p>
+						{{ site.hero_title|default:"Sign in to manage bookings, connect with your local guides, and unlock personalized journeys." }}
+					</p>
+				</div>
+				<div class="img sign-in">
+					<img src="{% static 'img/auth/sign_in.svg' %}" alt="Welcome back to {{ site.site_name }}">
+				</div>
+			</div>
+			<!-- END SIGN IN CONTENT -->
+			<!-- SIGN UP CONTENT -->
+			<div class="col align-items-center flex-col">
+				<div class="img sign-up">
+					<img src="{% static 'img/auth/sign_up.svg' %}" alt="Join {{ site.site_name }}">
+				</div>
+				<div class="text sign-up">
+					<h2>
+						Join with us
+					</h2>
+					<p>
+						{{ site.tagline|default:"Explore curated tours worldwide, track trips in real time, and share unforgettable experiences." }}
+					</p>
+				</div>
+			</div>
+			<!-- END SIGN UP CONTENT -->
+		</div>
+		<!-- END CONTENT SECTION -->
+	</div>
+
+	<!-- FORGOT PASSWORD MODAL -->
+	<div id="forgotModal" class="auth-modal-overlay">
+		<div class="auth-modal-card">
+			<button type="button" class="auth-modal-close" onclick="closeForgotPassword()" aria-label="Close modal">&times;</button>
+			<div class="auth-modal-icon">
+				<i class='bx bx-key'></i>
+			</div>
+			<h3>Reset password</h3>
+			<p>Enter your account email address and we will send a 6-digit verification code to reset your password.</p>
+			<form method="post" action="{% url 'accounts:forgot_password' %}">
+				{% csrf_token %}
+				<div class="input-group">
+					<i class='bx bx-envelope input-icon'></i>
+					<input type="email" name="email" id="forgotEmailInput" placeholder="Enter your email" required autocomplete="email">
+				</div>
+				<button type="submit" class="btn" style="width:100%;padding:0.75rem;border-radius:0.5rem;border:none;background:var(--primary-color);color:#fff;font-weight:600;cursor:pointer;">Send verification code</button>
+			</form>
+		</div>
+	</div>
+    
+	<script>
+		window.AUTH_CONFIG = {
+			loginUrl: "{% url 'accounts:login' %}",
+			signupUrl: "{% url 'accounts:signup' %}",
+			siteName: "{{ site.site_name|escapejs }}"
+		};
+	</script>
+    <script src="{% static 'js/auth.js' %}"></script>
+</body>
+</html>

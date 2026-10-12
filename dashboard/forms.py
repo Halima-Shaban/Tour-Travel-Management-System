@@ -41,11 +41,18 @@ class UserRoleForm(StyledFormMixin, forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields["is_active"].initial = self.instance.user.is_active
         self.fields["is_active"].widget.attrs["class"] = "form-check-input"
+        if "years_experience" in self.fields:
+            self.fields["years_experience"].required = False
+
+    def clean_years_experience(self):
+        val = self.cleaned_data.get("years_experience")
+        return val if val is not None else 0
 
     def save(self, commit=True):
         profile = super().save(commit)
         user = profile.user
-        user.is_active = self.cleaned_data["is_active"]
+        if "is_active" in self.data:
+            user.is_active = self.cleaned_data["is_active"]
         user.is_staff = profile.role == Profile.Role.ADMIN or user.is_superuser
         user.save(update_fields=["is_active", "is_staff"])
         return profile

@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 500 400" width="100%" height="100%">
+  <defs>
+    <linearGradient id="sunGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fde047" />
+      <stop offset="100%" stop-color="#f97316" />
+    </linearGradient>
+    <linearGradient id="mtnBack" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.85" />
+      <stop offset="100%" stop-color="#a7f3d0" stop-opacity="0.5" />
+    </linearGradient>
+    <linearGradient id="mtnFront" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.95" />
+      <stop offset="100%" stop-color="#6ee7b7" stop-opacity="0.75" />
+    </linearGradient>
+    <linearGradient id="balloonGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#ffffff" />
+      <stop offset="50%" stop-color="#34d399" />
+      <stop offset="100%" stop-color="#059669" />
+    </linearGradient>
+    <filter id="glowSignUp" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="#000000" flood-opacity="0.15" />
+    </filter>
+  </defs>
+
+  <!-- Twinkles & Stars -->
+  <g opacity="0.4">
+    <circle cx="90" cy="70" r="12" fill="#ffffff" />
+    <circle cx="430" cy="90" r="16" fill="#ffffff" />
+    <circle cx="160" cy="140" r="8" fill="#ffffff" />
+    <circle cx="370" cy="220" r="10" fill="#ffffff" />
+    <path d="M120,60 L130,60 M125,55 L125,65" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" />
+    <path d="M400,160 L415,160 M407,152 L407,168" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" />
+  </g>
+
+  <!-- Glowing Sun / Dawn -->
+  <circle cx="250" cy="180" r="65" fill="url(#sunGrad)" opacity="0.85" filter="url(#glowSignUp)" />
+
+  <!-- Hot Air Balloon -->
+  <g transform="translate(100, 75)" filter="url(#glowSignUp)">
+    <!-- Balloon Body -->
+    <path d="M40,0 C15,0 0,25 0,55 C0,80 25,95 33,105 L47,105 C55,95 80,80 80,55 C80,25 65,0 40,0 Z" fill="url(#balloonGrad)" />
+    <!-- Stripes -->
+    <path d="M40,0 C30,0 22,25 22,55 C22,80 32,95 36,105 L44,105 C48,95 58,80 58,55 C58,25 50,0 40,0 Z" fill="#ffffff" opacity="0.75" />
+    <!-- Basket Ropes -->
+    <line x1="33" y1="105" x2="35" y2="116" stroke="#4b5563" stroke-width="1.5" />
+    <line x1="47" y1="105" x2="45" y2="116" stroke="#4b5563" stroke-width="1.5" />
+    <!-- Basket -->
+    <rect x="33" y="116" width="14" height="11" rx="2" fill="#d97706" />
+  </g>
+
+  <!-- Background Mountains -->
+  <polygon points="120,320 220,180 320,320" fill="url(#mtnBack)" filter="url(#glowSignUp)" />
+  <polygon points="260,320 350,210 440,320" fill="url(#mtnBack)" filter="url(#glowSignUp)" />
+
+  <!-- Foreground Mountains with Snowcaps -->
+  <g filter="url(#glowSignUp)">
+    <polygon points="40,350 170,190 300,350" fill="url(#mtnFront)" />
+    <!-- Snowcap Left Peak -->
+    <polygon points="170,190 145,225 158,220 170,227 182,220 195,225" fill="#ffffff" />
+
+    <polygon points="210,350 320,220 430,350" fill="url(#mtnFront)" />
+    <!-- Snowcap Right Peak -->
+    <polygon points="320,220 300,250 310,245 320,252 330,245 340,250" fill="#ffffff" />
+  </g>
+
+  <!-- Adventure Compass / Pin Marker -->
+  <g transform="translate(350, 240) rotate(15)" filter="url(#glowSignUp)">
+    <circle cx="40" cy="40" r="32" fill="#ffffff" stroke="#10b981" stroke-width="3" />
+    <polygon points="40,16 48,36 40,32" fill="#ef4444" />
+    <polygon points="40,64 48,44 40,48" fill="#1e3a5f" />
+    <polygon points="40,16 32,36 40,32" fill="#dc2626" />
+    <polygon points="40,64 32,44 40,48" fill="#3b82f6" />
+    <circle cx="40" cy="40" r="5" fill="#f59e0b" />
+  </g>
+
+  <!-- Winding Path -->
+  <path d="M140,350 Q230,300 270,350" fill="none" stroke="#ffffff" stroke-width="6" stroke-linecap="round" opacity="0.8" />
+</svg>

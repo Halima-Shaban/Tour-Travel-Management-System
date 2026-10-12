@@ -21,20 +21,20 @@
               {% for form in formset %}
               <div class="participant-row row g-2 align-items-start mb-2">
                 {{ form.id }}
-                <div class="col-md-4">{{ form.full_name }}{{ form.full_name.errors }}</div>
-                <div class="col-3 col-md-2">{{ form.age }}</div>
-                <div class="col-4 col-md-3">{{ form.nationality }}</div>
-                <div class="col-5 col-md-3">{{ form.notes }}<label class="small text-danger mt-1 d-inline-flex gap-1 align-items-center" style="cursor:pointer">{{ form.DELETE }} Remove</label></div>
+                <div class="col-12 col-sm-4">{{ form.full_name }}{{ form.full_name.errors }}</div>
+                <div class="col-4 col-sm-2">{{ form.age }}</div>
+                <div class="col-8 col-sm-3">{{ form.nationality }}</div>
+                <div class="col-12 col-sm-3">{{ form.notes }}<label class="small text-danger mt-1 d-inline-flex gap-1 align-items-center" style="cursor:pointer">{{ form.DELETE }} Remove</label></div>
               </div>
               {% endfor %}
             </div>
             <template id="participant-template">
               <div class="participant-row row g-2 align-items-start mb-2">
                 {{ formset.empty_form.id }}
-                <div class="col-md-4">{{ formset.empty_form.full_name }}</div>
-                <div class="col-3 col-md-2">{{ formset.empty_form.age }}</div>
-                <div class="col-4 col-md-3">{{ formset.empty_form.nationality }}</div>
-                <div class="col-5 col-md-3">{{ formset.empty_form.notes }}</div>
+                <div class="col-12 col-sm-4">{{ formset.empty_form.full_name }}</div>
+                <div class="col-4 col-sm-2">{{ formset.empty_form.age }}</div>
+                <div class="col-8 col-sm-3">{{ formset.empty_form.nationality }}</div>
+                <div class="col-12 col-sm-3">{{ formset.empty_form.notes }}</div>
               </div>
             </template>
             <div class="d-flex gap-2 mt-3">

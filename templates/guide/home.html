@@ -20,10 +20,10 @@
   </div>
   <div class="col-lg-7">
     <div class="row g-3 h-100">
-      <div class="col-6"><div class="kpi"><span class="icon-circle tone-brand"><i class="bi bi-calendar-event"></i></span><div><div class="label">Upcoming bookings</div><div class="value">{{ kpis.upcoming }}</div><div class="small text-muted-2">{{ kpis.travelers_upcoming }} travelers</div></div></div></div>
-      <div class="col-6"><div class="kpi"><span class="icon-circle tone-accent"><i class="bi bi-inbox"></i></span><div><div class="label">Trip requests</div><div class="value">{{ kpis.requests }}</div><a class="small" href="{% url 'guide:bookings' %}?tab=requests">Accept or decline →</a></div></div></div>
-      <div class="col-6"><div class="kpi"><span class="icon-circle tone-green"><i class="bi bi-flag"></i></span><div><div class="label">Completed trips</div><div class="value">{{ kpis.completed }}</div><div class="small text-muted-2">{{ kpis.tours }} active tours</div></div></div></div>
-      <div class="col-6"><div class="kpi"><span class="icon-circle tone-violet"><i class="bi bi-star-fill"></i></span><div><div class="label">My rating</div><div class="value">{{ kpis.rating|default:"-" }}<small class="fs-6 text-muted-2">/5</small></div><div class="small text-muted-2">{{ kpis.reviews }} reviews</div></div></div></div>
+      <div class="col-12 col-sm-6"><div class="kpi"><span class="icon-circle tone-brand"><i class="bi bi-calendar-event"></i></span><div><div class="label">Upcoming bookings</div><div class="value">{{ kpis.upcoming }}</div><div class="small text-muted-2">{{ kpis.travelers_upcoming }} travelers</div></div></div></div>
+      <div class="col-12 col-sm-6"><div class="kpi"><span class="icon-circle tone-accent"><i class="bi bi-inbox"></i></span><div><div class="label">Trip requests</div><div class="value">{{ kpis.requests }}</div><a class="small" href="{% url 'guide:bookings' %}?tab=requests">Accept or decline →</a></div></div></div>
+      <div class="col-12 col-sm-6"><div class="kpi"><span class="icon-circle tone-green"><i class="bi bi-flag"></i></span><div><div class="label">Completed trips</div><div class="value">{{ kpis.completed }}</div><div class="small text-muted-2">{{ kpis.tours }} active tours</div></div></div></div>
+      <div class="col-12 col-sm-6"><div class="kpi"><span class="icon-circle tone-violet"><i class="bi bi-star-fill"></i></span><div><div class="label">My rating</div><div class="value">{{ kpis.rating|default:"-" }}<small class="fs-6 text-muted-2">/5</small></div><div class="small text-muted-2">{{ kpis.reviews }} reviews</div></div></div></div>
     </div>
   </div>
 </div>

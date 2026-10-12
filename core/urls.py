@@ -9,4 +9,5 @@ urlpatterns = [
     path("about/", views.about, name="about"),
     path("contact/", views.contact, name="contact"),
     path("newsletter/", views.newsletter, name="newsletter"),
+    path("newsletter/ajax/", views.newsletter_ajax, name="newsletter_ajax"),
 ]

@@ -37,4 +37,21 @@
 .chat-foot button { width: 44px; border: 0; border-radius: 12px; background: var(--brand); color: #fff; font-size: 1.1rem; }
 .chat-foot button:disabled { opacity: .5; }
 .chat-note { font-size: .68rem; color: var(--muted); text-align: center; padding: 0 0 .5rem; background: var(--surface); }
-@media (max-width: 575.98px) { .chat-panel { right: 12px; bottom: 88px; height: calc(100vh - 110px); } .chat-launcher { right: 14px; bottom: 14px; } }
+@media (max-width: 575.98px) {
+  .chat-panel {
+    right: 8px;
+    left: 8px;
+    bottom: 8px;
+    width: auto;
+    max-width: none;
+    height: calc(100vh - 16px);
+    height: calc(100dvh - 16px);
+    max-height: calc(100dvh - 16px);
+    border-radius: 16px;
+  }
+  .chat-launcher { right: 16px; bottom: 16px; width: 52px; height: 52px; font-size: 1.3rem; }
+  .chat-head { padding: .8rem .95rem; }
+  .chat-body { padding: .75rem; }
+  .chat-foot { padding: .65rem; }
+  .chat-foot textarea { font-size: 1rem; }
+}

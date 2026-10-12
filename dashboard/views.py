@@ -369,7 +369,7 @@ def user_edit(request, pk):
     user = get_object_or_404(User.objects.select_related("profile"), pk=pk)
     form = UserRoleForm(request.POST or None, instance=user.profile)
     if request.method == "POST" and form.is_valid():
-        if user == request.user and form.cleaned_data["role"] != Profile.Role.ADMIN and not user.is_superuser:
+        if user == request.user and form.cleaned_data["role"] != Profile.Role.ADMIN:
             messages.error(request, "You can't remove your own admin role.")
         else:
             form.save()

@@ -36,7 +36,9 @@ Change these before deploying. Tests: `python manage.py test tests`.
 
 ## Documentation
 
-Full docs live in [`docs/`](docs/README.md): [installation](docs/installation.md) ·
+Full comprehensive system documentation is available at **[`docs/FULL_DOCUMENTATION.md`](docs/FULL_DOCUMENTATION.md)**.
+
+Individual guides live in [`docs/`](docs/README.md): [full documentation](docs/FULL_DOCUMENTATION.md) · [installation](docs/installation.md) ·
 [configuration](docs/configuration.md) · [customization](docs/customization.md) ·
 [admin dashboard](docs/admin-dashboard.md) · [guide dashboard](docs/guide-dashboard.md) ·
 [booking workflow](docs/workflow.md) · [payments](docs/payments.md) · [chatbot](docs/chatbot.md) · [architecture](docs/architecture.md) · [deployment](docs/deployment.md)
