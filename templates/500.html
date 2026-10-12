@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+{% block title %}Server Error{% endblock %}
+{% block content %}
+<section class="section" style="padding-top:10rem">
+  <div class="container empty-state text-center">
+    <i class="bi bi-exclamation-triangle display-1 text-warning"></i>
+    <h1 class="display-4 fw-bold text-body mt-3">500 - Server Error</h1>
+    <p class="lead text-muted">Something went wrong on our end. Please try again later or return to the homepage.</p>
+    <a class="btn btn-primary mt-3" href="/">Back to Home</a>
+  </div>
+</section>
+{% endblock %}
